@@ -78,7 +78,7 @@ export function FolderTreeItem({
     <div className="select-none">
       <div
         className={`
-          flex items-center gap-1 py-1 px-2 rounded-md hover:bg-accent/50 transition-colors
+          group flex items-center gap-1 py-1 px-2 rounded-md hover:bg-accent/50 transition-colors
           ${isSelected ? "bg-accent" : ""}
           ${isDeleting ? "opacity-50 pointer-events-none" : ""}
         `}

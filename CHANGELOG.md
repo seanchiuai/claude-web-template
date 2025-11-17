@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Added - 2025-11-16
+
 - **Project & Folder Organization System**: Full hierarchical bookmark organization
   - Projects table with default project support
   - Folders table with nested structure (max 5 levels deep)
@@ -23,6 +24,7 @@
   - Added dialog component from shadcn/ui
 
 ### Important Notes
+
 - **Setup Required**: Run `npx convex dev` to deploy schema and generate types
 - All operations secured with row-level filtering by userId
 - Real-time updates via Convex subscriptions (automatic)

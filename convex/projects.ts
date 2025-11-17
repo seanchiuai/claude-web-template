@@ -70,21 +70,26 @@ export const createProject = mutation({
       throw new Error("Not authenticated");
     }
 
+    // Trim name once and reuse
+    const trimmedName = args.name.trim();
+
     // Validate name length
-    if (args.name.trim().length === 0) {
+    if (trimmedName.length === 0) {
       throw new Error("Project name cannot be empty");
     }
-    if (args.name.length > 100) {
+    if (trimmedName.length > 100) {
       throw new Error("Project name must be 100 characters or less");
     }
 
-    // Check if name already exists for this user
-    const existingProjects = await ctx.db
+    // Check if name already exists using efficient index query
+    const existingProject = await ctx.db
       .query("projects")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
-      .collect();
+      .withIndex("by_user_name", (q) =>
+        q.eq("userId", identity.subject).eq("name", trimmedName)
+      )
+      .first();
 
-    if (existingProjects.some((p) => p.name === args.name.trim())) {
+    if (existingProject) {
       throw new Error("A project with this name already exists");
     }
 
@@ -105,7 +110,7 @@ export const createProject = mutation({
     const now = Date.now();
     const projectId = await ctx.db.insert("projects", {
       userId: identity.subject,
-      name: args.name.trim(),
+      name: trimmedName,
       isDefault: args.isDefault ?? false,
       createdAt: now,
       updatedAt: now,
@@ -132,30 +137,31 @@ export const updateProject = mutation({
       throw new Error("Project not found or unauthorized");
     }
 
+    // Trim name once and reuse
+    const trimmedName = args.name.trim();
+
     // Validate name
-    if (args.name.trim().length === 0) {
+    if (trimmedName.length === 0) {
       throw new Error("Project name cannot be empty");
     }
-    if (args.name.length > 100) {
+    if (trimmedName.length > 100) {
       throw new Error("Project name must be 100 characters or less");
     }
 
-    // Check for duplicate name
-    const existingProjects = await ctx.db
+    // Check for duplicate name using efficient index query
+    const existingProject = await ctx.db
       .query("projects")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
-      .collect();
-
-    if (
-      existingProjects.some(
-        (p) => p.name === args.name.trim() && p._id !== args.projectId
+      .withIndex("by_user_name", (q) =>
+        q.eq("userId", identity.subject).eq("name", trimmedName)
       )
-    ) {
+      .first();
+
+    if (existingProject && existingProject._id !== args.projectId) {
       throw new Error("A project with this name already exists");
     }
 
     await ctx.db.patch(args.projectId, {
-      name: args.name.trim(),
+      name: trimmedName,
       updatedAt: Date.now(),
     });
   },
@@ -175,32 +181,49 @@ export const deleteProject = mutation({
       throw new Error("Project not found or unauthorized");
     }
 
-    // Prevent deleting default project
+    // Handle default project deletion
     if (project.isDefault) {
-      throw new Error("Cannot delete the default project");
+      // Find another project to promote
+      const otherProjects = await ctx.db
+        .query("projects")
+        .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+        .collect();
+
+      const fallbackProject = otherProjects.find((p) => p._id !== args.projectId);
+
+      if (!fallbackProject) {
+        throw new Error(
+          "Cannot delete the only project. Please create another project first."
+        );
+      }
+
+      // Promote fallback project to default before deleting
+      await ctx.db.patch(fallbackProject._id, { isDefault: true });
     }
 
-    // Delete all bookmarks in this project's folders
+    // Get all folders in this project
     const folders = await ctx.db
       .query("folders")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .collect();
 
-    for (const folder of folders) {
-      const bookmarks = await ctx.db
-        .query("bookmarks")
-        .withIndex("by_folder", (q) => q.eq("folderId", folder._id))
-        .collect();
+    // Collect all bookmark IDs across all folders in parallel
+    const bookmarksByFolder = await Promise.all(
+      folders.map(async (folder) => {
+        const bookmarks = await ctx.db
+          .query("bookmarks")
+          .withIndex("by_folder", (q) => q.eq("folderId", folder._id))
+          .collect();
+        return bookmarks;
+      })
+    );
 
-      for (const bookmark of bookmarks) {
-        await ctx.db.delete(bookmark._id);
-      }
-    }
+    // Flatten and delete all bookmarks in parallel
+    const allBookmarks = bookmarksByFolder.flat();
+    await Promise.all(allBookmarks.map((bookmark) => ctx.db.delete(bookmark._id)));
 
-    // Delete all folders in this project
-    for (const folder of folders) {
-      await ctx.db.delete(folder._id);
-    }
+    // Delete all folders in parallel
+    await Promise.all(folders.map((folder) => ctx.db.delete(folder._id)));
 
     // Delete the project
     await ctx.db.delete(args.projectId);

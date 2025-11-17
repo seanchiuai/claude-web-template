@@ -22,6 +22,7 @@ import { ProjectSwitcher } from "@/components/features/project-switcher";
 import { FolderTree } from "@/components/features/folder-tree";
 import { NewProjectDialog } from "@/components/features/new-project-dialog";
 import { NewFolderDialog } from "@/components/features/new-folder-dialog";
+import { RenameFolderDialog } from "@/components/features/rename-folder-dialog";
 import { IconBookmark } from "@tabler/icons-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -30,7 +31,9 @@ function BookmarksSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [selectedFolderId, setSelectedFolderId] = React.useState<Id<"folders"> | undefined>();
   const [newProjectDialogOpen, setNewProjectDialogOpen] = React.useState(false);
   const [newFolderDialogOpen, setNewFolderDialogOpen] = React.useState(false);
+  const [renameFolderDialogOpen, setRenameFolderDialogOpen] = React.useState(false);
   const [parentFolderIdForNew, setParentFolderIdForNew] = React.useState<Id<"folders"> | undefined>();
+  const [folderIdToRename, setFolderIdToRename] = React.useState<Id<"folders"> | null>(null);
 
   const defaultProject = useQuery(api.projects.getDefaultProject);
   const initializeDefaults = useMutation(api.init.initializeUserDefaults);
@@ -60,8 +63,8 @@ function BookmarksSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   const handleRenameFolder = (folderId: Id<"folders">) => {
-    // TODO: Implement rename dialog
-    console.log("Rename folder:", folderId);
+    setFolderIdToRename(folderId);
+    setRenameFolderDialogOpen(true);
   };
 
   return (
@@ -120,6 +123,13 @@ function BookmarksSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           onSuccess={() => setParentFolderIdForNew(undefined)}
         />
       )}
+
+      <RenameFolderDialog
+        open={renameFolderDialogOpen}
+        onOpenChange={setRenameFolderDialogOpen}
+        folderId={folderIdToRename}
+        onSuccess={() => setFolderIdToRename(null)}
+      />
     </>
   );
 }

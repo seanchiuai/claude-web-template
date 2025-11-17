@@ -26,7 +26,8 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_user", ["userId"])
-    .index("by_user_default", ["userId", "isDefault"]),
+    .index("by_user_default", ["userId", "isDefault"])
+    .index("by_user_name", ["userId", "name"]),
 
   folders: defineTable({
     projectId: v.id("projects"),
@@ -38,7 +39,8 @@ export default defineSchema({
   })
     .index("by_project", ["projectId"])
     .index("by_parent", ["parentFolderId"])
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"])
+    .index("by_project_parent", ["projectId", "parentFolderId"]),
 
   bookmarks: defineTable({
     folderId: v.id("folders"),

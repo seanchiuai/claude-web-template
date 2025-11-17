@@ -4,10 +4,16 @@ import * as React from "react";
 import { IconPlus, IconFolderPlus } from "@tabler/icons-react";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { FolderTreeItem } from "./folder-tree-item";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+
+// Match the FolderNode type from convex/folders.ts
+interface FolderNode extends Doc<"folders"> {
+  children: FolderNode[];
+  bookmarkCount: number;
+}
 
 interface FolderTreeProps {
   projectId: Id<"projects">;
@@ -66,7 +72,7 @@ export function FolderTree({
         </Button>
       </div>
       <div className="space-y-0.5">
-        {folders.map((folder: any) => (
+        {folders.map((folder: FolderNode) => (
           <FolderTreeItem
             key={folder._id}
             folder={folder}

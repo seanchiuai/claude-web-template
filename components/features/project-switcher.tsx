@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Id } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 
 interface ProjectSwitcherProps {
   currentProjectId?: Id<"projects">;
@@ -31,7 +31,7 @@ export function ProjectSwitcher({
 
   const currentProject = React.useMemo(() => {
     if (!projects || !currentProjectId) return null;
-    return projects.find((p: any) => p._id === currentProjectId);
+    return projects.find((p: Doc<"projects">) => p._id === currentProjectId);
   }, [projects, currentProjectId]);
 
   if (!projects) {
@@ -56,7 +56,7 @@ export function ProjectSwitcher({
       <DropdownMenuContent align="start" className="w-[200px]">
         <DropdownMenuLabel>Projects</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {projects.map((project: any) => (
+        {projects.map((project: Doc<"projects">) => (
           <DropdownMenuItem
             key={project._id}
             onClick={() => onProjectChange(project._id)}

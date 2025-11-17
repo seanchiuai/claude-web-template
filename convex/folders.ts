@@ -1,36 +1,73 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, QueryCtx, MutationCtx } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
 const MAX_FOLDER_DEPTH = 5;
 
-// Helper to calculate folder depth
+// Helper to calculate folder depth with cycle detection
 async function getFolderDepth(
-  ctx: any,
+  ctx: QueryCtx | MutationCtx,
   folderId: Id<"folders"> | undefined
 ): Promise<number> {
   if (!folderId) return 0;
 
-  const folder = await ctx.db.get(folderId);
-  if (!folder) return 0;
+  const visited = new Set<string>();
+  let currentId: Id<"folders"> | undefined = folderId;
+  let depth = 0;
 
-  return 1 + (await getFolderDepth(ctx, folder.parentFolderId));
+  while (currentId && depth <= MAX_FOLDER_DEPTH) {
+    if (visited.has(currentId)) {
+      // Cycle detected
+      throw new Error("Circular folder reference detected");
+    }
+
+    visited.add(currentId);
+    const folder = await ctx.db.get(currentId);
+
+    if (!folder) break;
+
+    depth++;
+    currentId = folder.parentFolderId;
+  }
+
+  if (depth > MAX_FOLDER_DEPTH) {
+    throw new Error("Folder depth exceeds maximum limit");
+  }
+
+  return depth;
 }
 
 // Helper to check if moving would create a circular reference
 async function wouldCreateCircularReference(
-  ctx: any,
+  ctx: QueryCtx | MutationCtx,
   folderId: Id<"folders">,
   newParentId: Id<"folders"> | undefined
 ): Promise<boolean> {
   if (!newParentId) return false;
   if (folderId === newParentId) return true;
 
+  const visited = new Set<string>();
+  const maxDepth = 1000; // Safety limit
+  let depth = 0;
   let currentParent = await ctx.db.get(newParentId);
-  while (currentParent) {
+
+  while (currentParent && depth < maxDepth) {
+    // Check if we've seen this ID before (cycle detected)
+    if (visited.has(currentParent._id)) {
+      return true; // Existing cycle in newParent chain
+    }
+
     if (currentParent._id === folderId) return true;
+
+    visited.add(currentParent._id);
+    depth++;
+
     if (!currentParent.parentFolderId) break;
     currentParent = await ctx.db.get(currentParent.parentFolderId);
+  }
+
+  if (depth >= maxDepth) {
+    return true; // Potential cycle or too deep
   }
 
   return false;
@@ -43,7 +80,7 @@ interface FolderNode extends Doc<"folders"> {
 }
 
 async function buildFolderTree(
-  ctx: any,
+  ctx: QueryCtx | MutationCtx,
   folders: Doc<"folders">[]
 ): Promise<FolderNode[]> {
   const folderMap = new Map<Id<"folders">, FolderNode>();
@@ -101,7 +138,7 @@ export const listFoldersInProject = query({
 
     const folders = await ctx.db
       .query("folders")
-      .withIndex("by_project", (q: any) => q.eq("projectId", args.projectId))
+      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .collect();
 
     return await buildFolderTree(ctx, folders);
@@ -142,12 +179,19 @@ export const getFolderPath = query({
 
     const path: Doc<"folders">[] = [folder];
     let currentFolder = folder;
+    const maxDepth = 100; // Safety limit to prevent infinite loops
+    let depth = 0;
 
-    while (currentFolder.parentFolderId) {
+    while (currentFolder.parentFolderId && depth < maxDepth) {
       const parent = await ctx.db.get(currentFolder.parentFolderId);
       if (!parent) break;
       path.unshift(parent);
       currentFolder = parent;
+      depth++;
+    }
+
+    if (depth >= maxDepth) {
+      throw new Error("Folder path exceeded maximum depth - possible circular reference");
     }
 
     return path;
@@ -198,17 +242,18 @@ export const createFolder = mutation({
       }
     }
 
-    // Check for duplicate name in the same parent
+    // Trim name once and reuse
+    const trimmedName = args.name.trim();
+
+    // Check for duplicate name in the same parent using efficient index query
     const siblingFolders = await ctx.db
       .query("folders")
-      .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
+      .withIndex("by_project_parent", (q) =>
+        q.eq("projectId", args.projectId).eq("parentFolderId", args.parentFolderId)
+      )
       .collect();
 
-    const hasDuplicate = siblingFolders.some(
-      (f) =>
-        f.name === args.name.trim() &&
-        f.parentFolderId === args.parentFolderId
-    );
+    const hasDuplicate = siblingFolders.some((f) => f.name === trimmedName);
 
     if (hasDuplicate) {
       throw new Error("A folder with this name already exists in this location");
@@ -218,7 +263,7 @@ export const createFolder = mutation({
     const folderId = await ctx.db.insert("folders", {
       projectId: args.projectId,
       parentFolderId: args.parentFolderId,
-      name: args.name.trim(),
+      name: trimmedName,
       userId: identity.subject,
       createdAt: now,
       updatedAt: now,
@@ -246,24 +291,24 @@ export const updateFolder = mutation({
     }
 
     // Validate name
-    if (args.name.trim().length === 0) {
+    const trimmedName = args.name.trim();
+    if (trimmedName.length === 0) {
       throw new Error("Folder name cannot be empty");
     }
-    if (args.name.length > 100) {
+    if (trimmedName.length > 100) {
       throw new Error("Folder name must be 100 characters or less");
     }
 
-    // Check for duplicate name in the same parent
+    // Check for duplicate name in the same parent using efficient index query
     const siblingFolders = await ctx.db
       .query("folders")
-      .withIndex("by_project", (q) => q.eq("projectId", folder.projectId))
+      .withIndex("by_project_parent", (q) =>
+        q.eq("projectId", folder.projectId).eq("parentFolderId", folder.parentFolderId)
+      )
       .collect();
 
     const hasDuplicate = siblingFolders.some(
-      (f) =>
-        f.name === args.name.trim() &&
-        f.parentFolderId === folder.parentFolderId &&
-        f._id !== args.folderId
+      (f) => f.name === trimmedName && f._id !== args.folderId
     );
 
     if (hasDuplicate) {
@@ -271,7 +316,7 @@ export const updateFolder = mutation({
     }
 
     await ctx.db.patch(args.folderId, {
-      name: args.name.trim(),
+      name: trimmedName,
       updatedAt: Date.now(),
     });
   },
@@ -329,21 +374,26 @@ export const moveFolder = mutation({
   },
 });
 
-// Helper to get the maximum depth of a folder's subtree
+// Helper to get the maximum depth of a folder's subtree with recursion guard
 async function getSubtreeDepth(
-  ctx: any,
-  folderId: Id<"folders">
+  ctx: QueryCtx | MutationCtx,
+  folderId: Id<"folders">,
+  remainingDepth: number = MAX_FOLDER_DEPTH
 ): Promise<number> {
+  if (remainingDepth <= 0) {
+    throw new Error("Maximum folder depth exceeded during subtree calculation");
+  }
+
   const children = await ctx.db
     .query("folders")
-    .withIndex("by_parent", (q: any) => q.eq("parentFolderId", folderId))
+    .withIndex("by_parent", (q) => q.eq("parentFolderId", folderId))
     .collect();
 
   if (children.length === 0) return 1;
 
   let maxChildDepth = 0;
   for (const child of children) {
-    const childDepth = await getSubtreeDepth(ctx, child._id);
+    const childDepth = await getSubtreeDepth(ctx, child._id, remainingDepth - 1);
     maxChildDepth = Math.max(maxChildDepth, childDepth);
   }
 
@@ -371,13 +421,13 @@ export const deleteFolder = mutation({
 
 // Helper to recursively delete folder and all its children
 async function deleteFolderRecursive(
-  ctx: any,
+  ctx: MutationCtx,
   folderId: Id<"folders">
 ): Promise<void> {
   // Get all child folders
   const children = await ctx.db
     .query("folders")
-    .withIndex("by_parent", (q: any) => q.eq("parentFolderId", folderId))
+    .withIndex("by_parent", (q) => q.eq("parentFolderId", folderId))
     .collect();
 
   // Recursively delete children
@@ -388,7 +438,7 @@ async function deleteFolderRecursive(
   // Delete all bookmarks in this folder
   const bookmarks = await ctx.db
     .query("bookmarks")
-    .withIndex("by_folder", (q: any) => q.eq("folderId", folderId))
+    .withIndex("by_folder", (q) => q.eq("folderId", folderId))
     .collect();
 
   for (const bookmark of bookmarks) {
