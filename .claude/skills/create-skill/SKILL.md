@@ -1,9 +1,6 @@
 ---
 name: "Skill Creating"
 description: "Used to create a new skill. Used when a user wants to create a new skill "
-version: "1.0.0"
-dependencies: ["context7", "mcp-api", "python>=3.8"]
-allowed-tools: ["file_write"]
 ---
 
 # Create Skill

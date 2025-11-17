@@ -1,9 +1,6 @@
 ---
 name: "Agent Creating"
 description: "Used to create a new agent. Used when a user wants to create a new agent"
-version: "1.0.0"
-dependencies: ["context7", "mcp-api", "python>=3.8"]
-allowed-tools: ["file_write"]
 ---
 
 # Create Skill
