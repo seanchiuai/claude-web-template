@@ -39,12 +39,15 @@ export function RenameFolderDialog({
   );
   const updateFolder = useMutation(api.folders.updateFolder);
 
-  // Initialize name when folder loads
+  // Initialize name when folder loads or folderId changes
   React.useEffect(() => {
-    if (folder) {
+    if (folderId && folder) {
       setName(folder.name);
+    } else if (folderId && !folder) {
+      // Reset to empty while loading new folder
+      setName("");
     }
-  }, [folder]);
+  }, [folder, folderId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +86,7 @@ export function RenameFolderDialog({
     }
   };
 
-  if (!folder) return null;
+  const isLoading = !folder && folderId !== null;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -92,7 +95,7 @@ export function RenameFolderDialog({
           <DialogHeader>
             <DialogTitle>Rename Folder</DialogTitle>
             <DialogDescription>
-              Enter a new name for this folder.
+              {isLoading ? "Loading folder..." : "Enter a new name for this folder."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -103,8 +106,9 @@ export function RenameFolderDialog({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 maxLength={100}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isLoading}
                 autoFocus
+                placeholder={isLoading ? "Loading..." : ""}
               />
               <p className="text-xs text-muted-foreground">
                 {name.length}/100 characters
@@ -116,11 +120,11 @@ export function RenameFolderDialog({
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
-              disabled={isSubmitting}
+              disabled={isSubmitting || isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || !name.trim()}>
+            <Button type="submit" disabled={isSubmitting || isLoading || !name.trim()}>
               {isSubmitting ? "Renaming..." : "Rename Folder"}
             </Button>
           </DialogFooter>

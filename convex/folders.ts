@@ -15,7 +15,7 @@ async function getFolderDepth(
   let currentId: Id<"folders"> | undefined = folderId;
   let depth = 0;
 
-  while (currentId && depth <= MAX_FOLDER_DEPTH) {
+  while (currentId && depth < MAX_FOLDER_DEPTH) {
     if (visited.has(currentId)) {
       // Cycle detected
       throw new Error("Circular folder reference detected");
@@ -30,7 +30,8 @@ async function getFolderDepth(
     currentId = folder.parentFolderId;
   }
 
-  if (depth > MAX_FOLDER_DEPTH) {
+  // If currentId is still set, we hit the depth limit
+  if (currentId) {
     throw new Error("Folder depth exceeds maximum limit");
   }
 
@@ -47,7 +48,8 @@ async function wouldCreateCircularReference(
   if (folderId === newParentId) return true;
 
   const visited = new Set<string>();
-  const maxDepth = 1000; // Safety limit
+  // Safety buffer: 10x the expected folder depth to catch corrupted data without masking issues
+  const maxDepth = MAX_FOLDER_DEPTH * 10;
   let depth = 0;
   let currentParent = await ctx.db.get(newParentId);
 

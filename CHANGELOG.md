@@ -8,9 +8,10 @@
 
 - **Project & Folder Organization System**: Full hierarchical bookmark organization
   - Projects table with default project support
-  - Folders table with nested structure (max 5 levels deep)
+  - Folders table with nested structure (max 5 levels deep for user-facing nesting)
   - Bookmarks table linking to folders
   - Auto-initialization: Default "Main" project + "Uncategorized" folder on first login
+  - Defense-in-depth: 5-level UI limit, 100-depth internal checks, 1000-depth technical fail-safe for corrupted data
 
 - **Backend (Convex)**:
   - `convex/projects.ts`: CRUD operations, default project management, validation
@@ -28,11 +29,12 @@
 #### Quality & Performance Improvements
 
 - **Type Safety**: Replaced all `any` types with proper Convex types (QueryCtx, MutationCtx, Doc<T>)
-- **Cycle Detection**: Added guards to prevent infinite loops in folder hierarchy traversal
-  - getFolderDepth: Iterative with visited set
-  - wouldCreateCircularReference: 1000 depth limit + cycle detection
-  - getFolderPath: 100 depth safeguard
+- **Cycle Detection**: Added layered guards to prevent infinite loops in folder hierarchy traversal
+  - getFolderDepth: Iterative with visited set (primary 5-level enforcement)
+  - wouldCreateCircularReference: 50-depth technical limit + cycle detection (10x safety buffer)
+  - getFolderPath: 100-depth safeguard for breadcrumb traversal
   - getSubtreeDepth: Recursive depth parameter
+  - Note: Multiple thresholds provide defense-in-depth against data corruption and cycles
 - **Performance**: Parallelized delete operations, added compound indexes
   - `by_user_name` on projects for efficient duplicate checks
   - `by_project_parent` on folders for sibling queries
@@ -46,4 +48,4 @@
 - **Setup Required**: Run `npx convex dev` to deploy schema and generate types
 - All operations secured with row-level filtering by userId
 - Real-time updates via Convex subscriptions (automatic)
-- Max folder depth: 5 levels to prevent performance issues
+- **Depth Limits**: 5-level user-facing limit with layered safeguards (100/1000-depth technical limits) for robustness
