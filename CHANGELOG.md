@@ -2,6 +2,28 @@
 
 ## [Unreleased] - 2025-11-17
 
+### Added - Tech Stack Agents
+
+**New Agents:**
+- `agent-openai.md`: OpenAI embeddings (text-embedding-3-small) + chat completions (gpt-4o-mini) with cost optimization, error handling, retry logic
+- `agent-shadcn.md`: shadcn/ui + Tailwind CSS 4 patterns, component usage, responsive design, dark mode, accessibility
+- `agent-unfurl.md`: Unfurl.js metadata extraction (OG, Twitter Cards, oEmbed), image storage, fallback strategy
+- `agent-microlink.md`: Microlink API for complex sites (Instagram, Twitter), smart fallback, quota management
+- `agent-vercel.md`: Next.js deployment, environment variables, preview/prod workflows, analytics, monitoring
+
+**Removed:**
+- `agent-ui.md`: Replaced by more comprehensive `agent-shadcn.md`
+
+**Each agent includes:**
+- Installation steps and configuration
+- Complete code examples with TypeScript
+- Best practices and patterns
+- Error handling strategies
+- Testing checklists
+- Resource links
+
+## [Unreleased] - 2025-11-17
+
 ### Added - AI Chat System with RAG
 
 **Backend:**
