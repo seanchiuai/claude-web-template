@@ -11,7 +11,7 @@
   - Folders table with nested structure (max 5 levels deep for user-facing nesting)
   - Bookmarks table linking to folders
   - Auto-initialization: Default "Main" project + "Uncategorized" folder on first login
-  - Defense-in-depth: 5-level UI limit, 100-depth internal checks, 1000-depth technical fail-safe for corrupted data
+  - Defense-in-depth: 5-level UI limit, 50-depth circular reference checks, 100-depth breadcrumb safeguard
 
 - **Backend (Convex)**:
   - `convex/projects.ts`: CRUD operations, default project management, validation
@@ -48,4 +48,4 @@
 - **Setup Required**: Run `npx convex dev` to deploy schema and generate types
 - All operations secured with row-level filtering by userId
 - Real-time updates via Convex subscriptions (automatic)
-- **Depth Limits**: 5-level user-facing limit with layered safeguards (100/1000-depth technical limits) for robustness
+- **Depth Limits**: 5-level user-facing limit with layered safeguards (50/100-depth technical limits) for robustness
