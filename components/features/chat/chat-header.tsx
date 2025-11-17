@@ -30,6 +30,7 @@ export function ChatHeader({
         <div className="flex items-center gap-1">
           {onOpenMemoryPanel && (
             <button
+              type="button"
               onClick={onOpenMemoryPanel}
               className={cn(
                 "rounded-lg p-2 transition-colors",
@@ -42,6 +43,7 @@ export function ChatHeader({
             </button>
           )}
           <button
+            type="button"
             onClick={onClearHistory}
             className={cn(
               "rounded-lg p-2 transition-colors",
@@ -53,6 +55,7 @@ export function ChatHeader({
             <Trash2 className="h-4 w-4" />
           </button>
           <button
+            type="button"
             onClick={onClose}
             className={cn(
               "rounded-lg p-2 transition-colors",

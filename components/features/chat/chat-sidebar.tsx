@@ -9,6 +9,7 @@ import { ChatInput } from "./chat-input";
 import { MemoryPanel } from "./memory-panel";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface ChatSidebarProps {
   isOpen: boolean;
@@ -56,6 +57,10 @@ export function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
       });
     } catch (error) {
       console.error("Failed to get chat response:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error("Failed to send message", {
+        description: `Could not get AI response: ${errorMessage}`,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -67,8 +72,13 @@ export function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
     ) {
       try {
         await clearHistory();
+        toast.success("Chat history cleared");
       } catch (error) {
         console.error("Failed to clear history:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        toast.error("Failed to clear chat history", {
+          description: errorMessage,
+        });
       }
     }
   };
@@ -76,13 +86,24 @@ export function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
   // Reverse messages to show newest at bottom
   const displayMessages = messages ? [...messages].reverse() : [];
 
+  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+      e.preventDefault();
+      onClose();
+    }
+  };
+
   return (
     <>
       {/* Overlay for mobile */}
       {isOpen && (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label="Close sidebar"
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={onClose}
+          onKeyDown={handleOverlayKeyDown}
         />
       )}
 
@@ -113,9 +134,9 @@ export function ChatSidebar({ isOpen, onClose }: ChatSidebarProps) {
             </div>
           )}
 
-          {displayMessages.map((msg, index) => (
+          {displayMessages.map((msg) => (
             <ChatMessage
-              key={index}
+              key={msg._id ?? `${msg.createdAt}-${msg.role}`}
               role={msg.role}
               content={msg.content}
               timestamp={msg.createdAt}

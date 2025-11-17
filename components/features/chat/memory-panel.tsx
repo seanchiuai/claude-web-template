@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { X, Plus, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface MemoryPanelProps {
   isOpen: boolean;
@@ -30,8 +31,13 @@ export function MemoryPanel({ isOpen, onClose }: MemoryPanelProps) {
         });
         setNewKey("");
         setNewValue("");
+        toast.success("Memory saved successfully");
       } catch (error) {
         console.error("Failed to save memory:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        toast.error("Failed to save memory", {
+          description: errorMessage,
+        });
       }
     }
   };
@@ -39,8 +45,20 @@ export function MemoryPanel({ isOpen, onClose }: MemoryPanelProps) {
   const handleDelete = async (memoryId: string) => {
     try {
       await deleteMemory({ memoryId });
+      toast.success("Memory deleted");
     } catch (error) {
       console.error("Failed to delete memory:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error("Failed to delete memory", {
+        description: errorMessage,
+      });
+    }
+  };
+
+  const handleOverlayKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Escape") {
+      e.preventDefault();
+      onClose();
     }
   };
 
@@ -50,8 +68,12 @@ export function MemoryPanel({ isOpen, onClose }: MemoryPanelProps) {
     <>
       {/* Overlay */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Close overlay"
         className="fixed inset-0 z-50 bg-black/50"
         onClick={onClose}
+        onKeyDown={handleOverlayKeyDown}
       />
 
       {/* Panel */}
@@ -60,6 +82,7 @@ export function MemoryPanel({ isOpen, onClose }: MemoryPanelProps) {
         <div className="flex items-center justify-between border-b p-4">
           <h2 className="text-lg font-semibold">Memory Settings</h2>
           <button
+            type="button"
             onClick={onClose}
             className="rounded-lg p-2 hover:bg-muted"
           >
@@ -100,6 +123,7 @@ export function MemoryPanel({ isOpen, onClose }: MemoryPanelProps) {
                 className="w-full rounded-lg border bg-background px-3 py-2 text-sm"
               />
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={!newKey.trim() || !newValue.trim()}
                 className={cn(
@@ -136,6 +160,7 @@ export function MemoryPanel({ isOpen, onClose }: MemoryPanelProps) {
                       <p className="text-sm text-muted-foreground">{memory.value}</p>
                     </div>
                     <button
+                      type="button"
                       onClick={() => handleDelete(memory._id)}
                       className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                     >

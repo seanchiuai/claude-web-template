@@ -18,8 +18,17 @@ export function BookmarkReferenceCard({
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  const getHostname = (urlString: string): string => {
+    try {
+      return new URL(urlString).hostname;
+    } catch {
+      return urlString;
+    }
+  };
+
   return (
     <button
+      type="button"
       onClick={handleClick}
       className={cn(
         "group w-full rounded-lg border bg-card p-3 text-left transition-all",
@@ -44,7 +53,7 @@ export function BookmarkReferenceCard({
             </p>
           )}
           <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
-            {new URL(url).hostname}
+            {getHostname(url)}
           </p>
         </div>
       </div>

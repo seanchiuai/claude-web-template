@@ -3,6 +3,29 @@ import { v } from "convex/values";
 import OpenAI from "openai";
 import { api } from "./_generated/api";
 
+// Configurable OpenAI parameters
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+const CHAT_TEMPERATURE = parseFloat(process.env.CHAT_TEMPERATURE || "0.7");
+const CHAT_MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS || "400", 10);
+
+// Type guard for OpenAI errors
+function isOpenAIError(e: unknown): e is { status?: number; message?: string } {
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    ("status" in e || "message" in e)
+  );
+}
+
+// Sanitize memory value to prevent formatting issues
+function sanitizeMemoryValue(value: string): string {
+  return value
+    .replace(/[\n\r\t]+/g, " ") // Replace newlines/tabs with space
+    .replace(/[^\x20-\x7E\s]/g, "") // Remove control characters
+    .trim()
+    .slice(0, 500); // Truncate to max 500 chars
+}
+
 export const getChatResponse = action({
   args: {
     userMessage: v.string(),
@@ -19,10 +42,14 @@ export const getChatResponse = action({
   handler: async (ctx, args): Promise<{
     response: string;
     bookmarkIds: string[];
-    suggestedMemories?: Array<{ key: string; value: string }>;
   }> => {
     const userId = (await ctx.auth.getUserIdentity())?.subject;
     if (!userId) throw new Error("Unauthorized");
+
+    // Validate OpenAI API key early
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY environment variable is not set");
+    }
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -31,9 +58,9 @@ export const getChatResponse = action({
     // Get user memory/preferences
     const userMemories = await ctx.runQuery(api.memory.getUserMemories);
 
-    // Build context
+    // Build context with sanitized memory values
     const memoriesContext = userMemories
-      .map((m) => `${m.key}: ${m.value}`)
+      .map((m) => `${m.key}: ${sanitizeMemoryValue(m.value)}`)
       .join("\n");
 
     // System prompt (simplified without bookmark context for now)
@@ -51,22 +78,26 @@ Guidelines:
     let response: string;
     try {
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: OPENAI_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           ...(args.conversationHistory || []).slice(-10), // Last 10 messages
           { role: "user", content: args.userMessage },
         ],
-        temperature: 0.7,
-        max_tokens: 400,
+        temperature: CHAT_TEMPERATURE,
+        max_tokens: CHAT_MAX_TOKENS,
       });
 
       response = completion.choices[0].message.content || "I couldn't generate a response.";
-    } catch (error: any) {
-      if (error.status === 429) {
-        response = "I'm a bit overloaded right now. Please try again in a moment.";
-      } else if (error.status === 401) {
-        response = "Authentication error. Please contact support.";
+    } catch (error: unknown) {
+      if (isOpenAIError(error)) {
+        if (error.status === 429) {
+          response = "I'm a bit overloaded right now. Please try again in a moment.";
+        } else if (error.status === 401) {
+          response = "Authentication error. Please contact support.";
+        } else {
+          response = `Sorry, I encountered an error: ${error.message || "Unknown error"}. Please try again.`;
+        }
       } else {
         response = "Sorry, I encountered an error. Please try again.";
       }
@@ -85,9 +116,17 @@ Guidelines:
       projectId: args.projectId,
     });
 
+    // TODO: Implement RAG bookmark search
+    // 1. Generate embedding for user query using OpenAI embeddings API
+    // 2. Search bookmarks table using vector similarity (requires embeddings table)
+    // 3. Score candidates by cosine similarity
+    // 4. Return top-N (e.g., 5) most relevant bookmark IDs
+    // 5. Include bookmark context in system prompt for better responses
+    const bookmarkIds: string[] = [];
+
     return {
       response,
-      bookmarkIds: [], // TODO: Add RAG bookmark search
+      bookmarkIds,
     };
   },
 });

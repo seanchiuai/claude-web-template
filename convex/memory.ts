@@ -42,32 +42,47 @@ export const saveMemory = mutation({
 });
 
 export const getUserMemories = query({
-  handler: async (ctx) => {
+  args: {
+    pageSize: v.optional(v.number()),
+    offset: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       return [];
     }
 
-    return await ctx.db
+    // Validate and normalize pagination params
+    const pageSize = Math.min(Math.max(args.pageSize ?? 50, 1), 100);
+    const offset = Math.max(args.offset ?? 0, 0);
+
+    const allMemories = await ctx.db
       .query("userMemory")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .collect();
+
+    // Apply pagination
+    const paginatedMemories = allMemories.slice(offset, offset + pageSize);
+
+    return paginatedMemories;
   },
 });
 
 export const deleteMemory = mutation({
-  args: { memoryId: v.string() },
+  args: {
+    memoryId: v.id("userMemory"),
+  },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
-    const memory = await ctx.db.get(args.memoryId as any);
+    const memory = await ctx.db.get(args.memoryId);
     if (!memory || memory.userId !== identity.subject) {
       throw new Error("Memory not found or unauthorized");
     }
 
-    await ctx.db.delete(args.memoryId as any);
+    await ctx.db.delete(args.memoryId);
   },
 });

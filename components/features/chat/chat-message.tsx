@@ -34,7 +34,10 @@ export function ChatMessage({ role, content, timestamp }: ChatMessageProps) {
               isUser ? "text-primary-foreground" : "text-muted-foreground"
             )}
           >
-            {new Date(timestamp).toLocaleTimeString()}
+            {new Date(timestamp).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </div>
         )}
       </div>

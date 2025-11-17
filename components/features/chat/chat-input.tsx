@@ -60,6 +60,7 @@ export function ChatInput({
           )}
         />
         <button
+          type="button"
           onClick={handleSend}
           disabled={!message.trim() || disabled}
           className={cn(

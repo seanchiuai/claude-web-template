@@ -14,7 +14,7 @@ export const saveMessage = mutation({
       throw new Error("Not authenticated");
     }
 
-    await ctx.db.insert("chatMessages", {
+    const messageId = await ctx.db.insert("chatMessages", {
       userId: identity.subject,
       role: args.role,
       content: args.content,
@@ -22,6 +22,8 @@ export const saveMessage = mutation({
       projectId: args.projectId,
       createdAt: Date.now(),
     });
+
+    return messageId;
   },
 });
 
@@ -44,19 +46,48 @@ export const listRecentMessages = query({
 });
 
 export const clearHistory = mutation({
-  handler: async (ctx) => {
+  args: {
+    maxAgeDays: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new Error("Not authenticated");
     }
 
-    const messages = await ctx.db
-      .query("chatMessages")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
-      .collect();
+    const BATCH_SIZE = 100;
+    const cutoffTime = args.maxAgeDays
+      ? Date.now() - args.maxAgeDays * 24 * 60 * 60 * 1000
+      : 0;
 
-    for (const msg of messages) {
-      await ctx.db.delete(msg._id);
+    // Delete in batches to avoid memory issues
+    let hasMore = true;
+    let totalDeleted = 0;
+
+    while (hasMore) {
+      const messages = await ctx.db
+        .query("chatMessages")
+        .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+        .filter((q) =>
+          cutoffTime > 0 ? q.lt(q.field("createdAt"), cutoffTime) : true
+        )
+        .take(BATCH_SIZE);
+
+      if (messages.length === 0) {
+        hasMore = false;
+      } else {
+        for (const msg of messages) {
+          await ctx.db.delete(msg._id);
+        }
+        totalDeleted += messages.length;
+
+        // If we got less than batch size, we're done
+        if (messages.length < BATCH_SIZE) {
+          hasMore = false;
+        }
+      }
     }
+
+    return { deletedCount: totalDeleted };
   },
 });
