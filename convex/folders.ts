@@ -83,21 +83,30 @@ interface FolderNode extends Doc<"folders"> {
 
 async function buildFolderTree(
   ctx: QueryCtx | MutationCtx,
-  folders: Doc<"folders">[]
+  folders: Doc<"folders">[],
+  userId: string
 ): Promise<FolderNode[]> {
   const folderMap = new Map<Id<"folders">, FolderNode>();
 
-  // Initialize all folders with children array
-  for (const folder of folders) {
-    const bookmarks = await ctx.db
-      .query("bookmarks")
-      .withIndex("by_folder", (q) => q.eq("folderId", folder._id))
-      .collect();
+  // Fetch all bookmarks for this user in a single query
+  const allBookmarks = await ctx.db
+    .query("bookmarks")
+    .withIndex("by_user", (q) => q.eq("userId", userId))
+    .collect();
 
+  // Build a map counting bookmarks per folder
+  const bookmarkCountByFolder = new Map<Id<"folders">, number>();
+  for (const bookmark of allBookmarks) {
+    const count = bookmarkCountByFolder.get(bookmark.folderId) || 0;
+    bookmarkCountByFolder.set(bookmark.folderId, count + 1);
+  }
+
+  // Initialize all folders with children array using the count map
+  for (const folder of folders) {
     folderMap.set(folder._id, {
       ...folder,
       children: [],
-      bookmarkCount: bookmarks.length,
+      bookmarkCount: bookmarkCountByFolder.get(folder._id) || 0,
     });
   }
 
@@ -129,7 +138,7 @@ export const listFoldersInProject = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return [];
+      throw new Error("Not authenticated");
     }
 
     // Verify project access
@@ -143,7 +152,7 @@ export const listFoldersInProject = query({
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
       .collect();
 
-    return await buildFolderTree(ctx, folders);
+    return await buildFolderTree(ctx, folders, identity.subject);
   },
 });
 
@@ -341,6 +350,22 @@ export const moveFolder = mutation({
       throw new Error("Folder not found or unauthorized");
     }
 
+    // Check for duplicate name in destination
+    const siblingFolders = await ctx.db
+      .query("folders")
+      .withIndex("by_project_parent", (q) =>
+        q.eq("projectId", folder.projectId).eq("parentFolderId", args.newParentFolderId)
+      )
+      .collect();
+
+    const hasDuplicate = siblingFolders.some(
+      (f) => f.name === folder.name && f._id !== args.folderId
+    );
+
+    if (hasDuplicate) {
+      throw new Error("A folder with this name already exists in the destination");
+    }
+
     // Verify new parent if specified
     if (args.newParentFolderId) {
       const newParent = await ctx.db.get(args.newParentFolderId);
@@ -424,8 +449,14 @@ export const deleteFolder = mutation({
 // Helper to recursively delete folder and all its children
 async function deleteFolderRecursive(
   ctx: MutationCtx,
-  folderId: Id<"folders">
+  folderId: Id<"folders">,
+  depth: number = 0
 ): Promise<void> {
+  // Recursion guard to prevent infinite loops from corrupted data
+  if (depth > MAX_FOLDER_DEPTH) {
+    throw new Error("Folder deletion exceeded maximum depth - possible data corruption");
+  }
+
   // Get all child folders
   const children = await ctx.db
     .query("folders")
@@ -434,7 +465,7 @@ async function deleteFolderRecursive(
 
   // Recursively delete children
   for (const child of children) {
-    await deleteFolderRecursive(ctx, child._id);
+    await deleteFolderRecursive(ctx, child._id, depth + 1);
   }
 
   // Delete all bookmarks in this folder

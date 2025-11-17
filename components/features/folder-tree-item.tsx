@@ -103,7 +103,12 @@ export function FolderTreeItem({
         )}
 
         {/* Folder Icon */}
-        <div onClick={() => onSelect(folder._id)} className="flex items-center gap-2 flex-1 cursor-pointer py-1">
+        <button
+          type="button"
+          onClick={() => onSelect(folder._id)}
+          className="flex items-center gap-2 flex-1 cursor-pointer py-1 bg-transparent border-0 text-left"
+          aria-expanded={isExpanded}
+        >
           {isExpanded ? (
             <IconFolderOpen className="h-4 w-4 text-muted-foreground shrink-0" />
           ) : (
@@ -119,7 +124,7 @@ export function FolderTreeItem({
               {folder.bookmarkCount}
             </Badge>
           )}
-        </div>
+        </button>
 
         {/* Context Menu */}
         <DropdownMenu>

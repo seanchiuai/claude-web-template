@@ -53,5 +53,7 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_folder", ["folderId"])
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"])
+    .index("by_folder_url", ["folderId", "url"])
+    .index("by_user_url", ["userId", "url"]),
 });

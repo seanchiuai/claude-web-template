@@ -25,6 +25,7 @@ import { NewFolderDialog } from "@/components/features/new-folder-dialog";
 import { RenameFolderDialog } from "@/components/features/rename-folder-dialog";
 import { IconBookmark } from "@tabler/icons-react";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 
 function BookmarksSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [currentProjectId, setCurrentProjectId] = React.useState<Id<"projects"> | undefined>();
@@ -45,9 +46,15 @@ function BookmarksSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       if (defaultProject === null) {
         // No default project, initialize
-        const result = await initializeDefaults({});
-        if (result.initialized && result.projectId) {
-          setCurrentProjectId(result.projectId);
+        try {
+          const result = await initializeDefaults({});
+          if (result.initialized && result.projectId) {
+            setCurrentProjectId(result.projectId);
+          }
+        } catch (error) {
+          console.error("Failed to initialize default project:", error);
+          toast.error("Failed to initialize workspace. Please refresh the page.");
+          return;
         }
       } else {
         setCurrentProjectId(defaultProject._id);
@@ -115,21 +122,23 @@ function BookmarksSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       />
 
       {currentProjectId && (
-        <NewFolderDialog
-          open={newFolderDialogOpen}
-          onOpenChange={setNewFolderDialogOpen}
-          projectId={currentProjectId}
-          parentFolderId={parentFolderIdForNew}
-          onSuccess={() => setParentFolderIdForNew(undefined)}
-        />
-      )}
+        <>
+          <NewFolderDialog
+            open={newFolderDialogOpen}
+            onOpenChange={setNewFolderDialogOpen}
+            projectId={currentProjectId}
+            parentFolderId={parentFolderIdForNew}
+            onSuccess={() => setParentFolderIdForNew(undefined)}
+          />
 
-      <RenameFolderDialog
-        open={renameFolderDialogOpen}
-        onOpenChange={setRenameFolderDialogOpen}
-        folderId={folderIdToRename}
-        onSuccess={() => setFolderIdToRename(null)}
-      />
+          <RenameFolderDialog
+            open={renameFolderDialogOpen}
+            onOpenChange={setRenameFolderDialogOpen}
+            folderId={folderIdToRename}
+            onSuccess={() => setFolderIdToRename(null)}
+          />
+        </>
+      )}
     </>
   );
 }

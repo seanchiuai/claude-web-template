@@ -81,18 +81,6 @@ export const createProject = mutation({
       throw new Error("Project name must be 100 characters or less");
     }
 
-    // Check if name already exists using efficient index query
-    const existingProject = await ctx.db
-      .query("projects")
-      .withIndex("by_user_name", (q) =>
-        q.eq("userId", identity.subject).eq("name", trimmedName)
-      )
-      .first();
-
-    if (existingProject) {
-      throw new Error("A project with this name already exists");
-    }
-
     // If setting as default, unset other default projects
     if (args.isDefault) {
       const currentDefault = await ctx.db
@@ -115,6 +103,21 @@ export const createProject = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    // Post-insert validation: check for duplicate name
+    const duplicateProjects = await ctx.db
+      .query("projects")
+      .withIndex("by_user_name", (q) =>
+        q.eq("userId", identity.subject).eq("name", trimmedName)
+      )
+      .collect();
+
+    // If we find more than one project with this name, we have a race condition
+    if (duplicateProjects.length > 1) {
+      // Delete the newly inserted project
+      await ctx.db.delete(projectId);
+      throw new Error("A project with this name already exists");
+    }
 
     return projectId;
   },
@@ -148,22 +151,32 @@ export const updateProject = mutation({
       throw new Error("Project name must be 100 characters or less");
     }
 
-    // Check for duplicate name using efficient index query
-    const existingProject = await ctx.db
-      .query("projects")
-      .withIndex("by_user_name", (q) =>
-        q.eq("userId", identity.subject).eq("name", trimmedName)
-      )
-      .first();
+    // Store original name for potential rollback
+    const originalName = project.name;
 
-    if (existingProject && existingProject._id !== args.projectId) {
-      throw new Error("A project with this name already exists");
-    }
-
+    // Perform the update
     await ctx.db.patch(args.projectId, {
       name: trimmedName,
       updatedAt: Date.now(),
     });
+
+    // Post-update validation: check for duplicate name
+    const duplicateProjects = await ctx.db
+      .query("projects")
+      .withIndex("by_user_name", (q) =>
+        q.eq("userId", identity.subject).eq("name", trimmedName)
+      )
+      .collect();
+
+    // If we find more than one project with this name, we have a duplicate
+    if (duplicateProjects.length > 1) {
+      // Rollback the change
+      await ctx.db.patch(args.projectId, {
+        name: originalName,
+        updatedAt: Date.now(),
+      });
+      throw new Error("A project with this name already exists");
+    }
   },
 });
 

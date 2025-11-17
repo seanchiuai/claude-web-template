@@ -13,27 +13,53 @@ export const initializeUserDefaults = mutation({
       throw new Error("Not authenticated");
     }
 
-    // Check if user already has projects
-    const existingProjects = await ctx.db
+    // Check if user already has a "Main" project (name-specific check to prevent races)
+    const existingMainProject = await ctx.db
       .query("projects")
-      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .withIndex("by_user_name", (q) =>
+        q.eq("userId", identity.subject).eq("name", "Main")
+      )
       .first();
 
-    if (existingProjects) {
-      // User already has projects, skip initialization
-      return { initialized: false, message: "User already has projects" };
+    if (existingMainProject) {
+      // User already has Main project, skip initialization
+      return {
+        initialized: false,
+        message: "Main project already exists",
+        projectId: existingMainProject._id
+      };
     }
 
     const now = Date.now();
 
     // Create default "Main" project
-    const projectId = await ctx.db.insert("projects", {
-      userId: identity.subject,
-      name: "Main",
-      isDefault: true,
-      createdAt: now,
-      updatedAt: now,
-    });
+    let projectId;
+    try {
+      projectId = await ctx.db.insert("projects", {
+        userId: identity.subject,
+        name: "Main",
+        isDefault: true,
+        createdAt: now,
+        updatedAt: now,
+      });
+    } catch (error) {
+      // If insert fails due to concurrent creation, query again and return existing
+      const mainProject = await ctx.db
+        .query("projects")
+        .withIndex("by_user_name", (q) =>
+          q.eq("userId", identity.subject).eq("name", "Main")
+        )
+        .first();
+
+      if (mainProject) {
+        return {
+          initialized: false,
+          message: "Main project was created concurrently",
+          projectId: mainProject._id
+        };
+      }
+      throw error;
+    }
 
     // Create default "Uncategorized" folder
     await ctx.db.insert("folders", {
