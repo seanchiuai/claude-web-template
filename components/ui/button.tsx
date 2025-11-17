@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]",
+        default: "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:brightness-105",
         destructive:
-          "bg-gradient-to-r from-destructive to-destructive/90 text-white shadow-lg shadow-destructive/25 hover:shadow-xl hover:shadow-destructive/30 hover:scale-[1.02]",
+          "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/25 hover:shadow-xl hover:shadow-destructive/30 hover:brightness-105",
         outline:
-          "border-2 border-border bg-transparent hover:border-primary/50 hover:bg-primary/5",
+          "border-2 border-border bg-transparent hover:border-primary/50 hover:bg-primary/5 transform transition-transform duration-150 ease-in-out",
         secondary:
-          "bg-gradient-to-r from-secondary to-secondary/90 text-white shadow-lg shadow-secondary/25 hover:shadow-xl hover:shadow-secondary/30 hover:scale-[1.02]",
+          "bg-gradient-to-r from-secondary to-secondary/90 text-secondary-foreground shadow-lg shadow-secondary/25 hover:shadow-xl hover:shadow-secondary/30 hover:brightness-105",
         ghost:
-          "hover:bg-muted/50 active:bg-muted",
+          "hover:bg-muted/50 active:bg-muted transform transition-transform duration-150 ease-in-out",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

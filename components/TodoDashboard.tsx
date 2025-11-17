@@ -1,11 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { Id } from "../convex/_generated/dataModel";
 
 type Tab = "all" | "pending" | "completed";
+
+// Helper to format dates with user's locale
+const formatDate = (date: number) => {
+  const userLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+  return new Date(date).toLocaleDateString(userLocale, {
+    month: "short",
+    day: "numeric"
+  });
+};
 
 export default function TodoDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("all");
@@ -14,6 +23,7 @@ export default function TodoDashboard() {
   const [editingId, setEditingId] = useState<Id<"todos"> | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const editInputRef = useRef<HTMLInputElement>(null);
 
   const todos = useQuery(api.todos.list);
   const createTodo = useMutation(api.todos.create);
@@ -59,6 +69,14 @@ export default function TodoDashboard() {
     setEditTitle("");
     setEditDescription("");
   };
+
+  // Focus edit input when editing starts
+  useEffect(() => {
+    if (editingId && editInputRef.current) {
+      editInputRef.current.focus();
+      editInputRef.current.select();
+    }
+  }, [editingId]);
 
   const filteredTodos = todos?.filter((todo) => {
     if (activeTab === "all") return true;
@@ -203,11 +221,11 @@ export default function TodoDashboard() {
               {editingId === todo._id ? (
                 <div className="space-y-3">
                   <input
+                    ref={editInputRef}
                     type="text"
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
                     className="w-full px-0 py-2 bg-transparent border-b border-border/50 outline-none font-medium focus:border-primary transition-colors"
-                    autoFocus
                   />
                   <textarea
                     value={editDescription}
@@ -282,19 +300,13 @@ export default function TodoDashboard() {
                       <div className="flex items-center gap-1.5">
                         <div className="w-1 h-1 rounded-full bg-muted-foreground/40" />
                         <span className="text-xs text-muted-foreground">
-                          {new Date(todo.createdAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric"
-                          })}
+                          {formatDate(todo.createdAt)}
                         </span>
                       </div>
                       {todo.completedAt && (
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs px-2 py-0.5 rounded-full bg-gradient-to-r from-secondary/20 to-accent/20 text-secondary font-medium">
-                            ✓ Completed {new Date(todo.completedAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric"
-                            })}
+                            ✓ Completed {formatDate(todo.completedAt)}
                           </span>
                         </div>
                       )}

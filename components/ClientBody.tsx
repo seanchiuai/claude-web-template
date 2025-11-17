@@ -11,9 +11,16 @@ export default function ClientBody({ className, children }: ClientBodyProps) {
   const bodyRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Apply the className to the actual body element after hydration
+    // Merge className with existing body classes instead of replacing
     if (className) {
-      document.body.className = className
+      const newClasses = className.split(' ').filter(Boolean)
+
+      // Add new classes that don't already exist
+      newClasses.forEach(cls => {
+        if (!document.body.classList.contains(cls)) {
+          document.body.classList.add(cls)
+        }
+      })
     }
 
     // Clean up any browser extension attributes that might cause hydration issues

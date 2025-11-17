@@ -128,11 +128,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50 transition-colors duration-200;
-  }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Apply transitions and styling only to interactive elements */
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [tabindex]:not([tabindex="-1"]) {
+    @apply border-border outline-ring/50 transition-colors duration-200;
   }
 }
 
@@ -216,6 +224,13 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Simplified glass for mobile/low-end devices */
+@media (max-width: 640px) {
+  .glass {
+    backdrop-filter: blur(8px);
+  }
+}
+
 /* Gradient backgrounds */
 .gradient-mesh {
   background:
@@ -231,4 +246,52 @@ h1, h2, h3, h4, h5, h6 {
     radial-gradient(at 100% 0%, rgba(29, 233, 214, 0.2) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(180, 167, 254, 0.2) 0px, transparent 50%),
     radial-gradient(at 0% 100%, rgba(251, 191, 36, 0.2) 0px, transparent 50%);
+}
+
+/* Simplified gradients for mobile */
+@media (max-width: 640px) {
+  .gradient-mesh {
+    background:
+      radial-gradient(at 50% 0%, rgba(255, 90, 95, 0.08) 0px, transparent 60%),
+      radial-gradient(at 50% 100%, rgba(16, 208, 191, 0.08) 0px, transparent 60%);
+  }
+
+  .dark .gradient-mesh {
+    background:
+      radial-gradient(at 50% 0%, rgba(255, 107, 112, 0.12) 0px, transparent 60%),
+      radial-gradient(at 50% 100%, rgba(29, 233, 214, 0.12) 0px, transparent 60%);
+  }
+}
+
+/* Respect user motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-fade-in,
+  .animate-slide-in,
+  .animate-scale-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .stagger-1,
+  .stagger-2,
+  .stagger-3,
+  .stagger-4,
+  .stagger-5,
+  .stagger-6 {
+    animation-delay: 0s;
+  }
+
+  .notion-hover {
+    @apply transition-none;
+  }
 }
