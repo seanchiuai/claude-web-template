@@ -1,6 +1,6 @@
-# Next.js + Convex + Clerk Starter Template
+# Sean's Claude Code Web Template
 
-A modern full-stack TypeScript starter template with authentication, real-time database, and beautiful UI components.
+A production-ready Next.js + Convex + Clerk template for rapid development with authentication, real-time database, and beautiful UI components.
 
 ## 🚀 Tech Stack
 
