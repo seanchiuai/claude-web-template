@@ -24,7 +24,7 @@ function RedirectToDashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push('/tasks');
+    router.push('/dashboard');
   }, [router]);
 
   return (
