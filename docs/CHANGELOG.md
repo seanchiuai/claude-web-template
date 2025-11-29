@@ -1,5 +1,25 @@
 # Changelog
 
+## [Unreleased] - 2025-11-29
+
+### Template Simplification - Minimal Convex Test
+
+**Removed ALL features - Now minimal template:**
+- Deleted 8 Convex tables → Single `messages` table
+- Deleted all routes → Single `/dashboard` route
+- Deleted all features: todos, bookmarks, chat, AI, search
+- Deleted navigation: sidebar, header, chat panel
+- Created ultra-minimal dashboard: text input + success confirmation
+- 49 files changed: 593 insertions, 6459 deletions
+
+**What's left:**
+- Clerk authentication (working)
+- Convex integration (working)
+- SimpleDashboard component: send text to Convex + see success message
+- Basic UI components (shadcn/ui + Tailwind)
+
+**Critical:** This is now a bare starter template. Add features as needed.
+
 ## [Unreleased] - 2025-11-17
 
 ### Added - Tech Stack Agents
