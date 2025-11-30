@@ -5,7 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import ClientBody from "@/components/ClientBody";
 
 export const metadata: Metadata = {
-  title: "Sean's Claude Code Web Template",
+  title: "NextJS WebApp Template",
   description: "A production-ready Next.js + Convex + Clerk template for rapid development",
   icons: {
     icon: "/convex.svg",

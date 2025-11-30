@@ -8,17 +8,7 @@
  * @module
  */
 
-import type * as bookmarks from "../bookmarks.js";
-import type * as chat from "../chat.js";
-import type * as chatMessages from "../chatMessages.js";
-import type * as embeddings from "../embeddings.js";
-import type * as folders from "../folders.js";
-import type * as init from "../init.js";
-import type * as memory from "../memory.js";
-import type * as myFunctions from "../myFunctions.js";
-import type * as projects from "../projects.js";
-import type * as search from "../search.js";
-import type * as todos from "../todos.js";
+import type * as messages from "../messages.js";
 
 import type {
   ApiFromModules,
@@ -27,17 +17,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  bookmarks: typeof bookmarks;
-  chat: typeof chat;
-  chatMessages: typeof chatMessages;
-  embeddings: typeof embeddings;
-  folders: typeof folders;
-  init: typeof init;
-  memory: typeof memory;
-  myFunctions: typeof myFunctions;
-  projects: typeof projects;
-  search: typeof search;
-  todos: typeof todos;
+  messages: typeof messages;
 }>;
 
 /**
