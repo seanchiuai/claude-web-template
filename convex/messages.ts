@@ -17,11 +17,12 @@ export const addMessage = mutation({
   },
 });
 
-export const getUserMessages = query({
+export const getMessages = query({
+  args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      return [];
+      throw new Error("Not authenticated");
     }
 
     const messages = await ctx.db

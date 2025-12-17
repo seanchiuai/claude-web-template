@@ -6,12 +6,13 @@ import { api } from "@/convex/_generated/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SignOutButton } from "@clerk/nextjs";
+import { Card } from "@/components/ui/card";
 
 export function SimpleDashboard() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const addMessage = useMutation(api.messages.addMessage);
-  const messages = useQuery(api.messages.getUserMessages) ?? [];
+  const messages = useQuery(api.messages.getMessages);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,21 +30,6 @@ export function SimpleDashboard() {
       console.error("Failed to send message:", error);
       setStatus("error");
     }
-  };
-
-  const formatDate = (timestamp: number) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
   };
 
   return (
@@ -92,26 +78,26 @@ export function SimpleDashboard() {
           )}
         </form>
 
-        {messages.length > 0 && (
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-              Your Messages
-            </h2>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
+        {/* Messages List */}
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">Your Messages</h2>
+          {messages === undefined ? (
+            <div className="text-sm text-muted-foreground">Loading messages...</div>
+          ) : messages.length === 0 ? (
+            <div className="text-sm text-muted-foreground">No messages yet. Send one above!</div>
+          ) : (
+            <div className="space-y-2">
               {messages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className="p-3 rounded-lg border border-border bg-card text-sm"
-                >
-                  <p className="text-foreground">{msg.content}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {formatDate(msg.createdAt)}
+                <Card key={msg._id} className="p-4">
+                  <p className="text-sm text-foreground">{msg.content}</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(msg.createdAt).toLocaleString()}
                   </p>
-                </div>
+                </Card>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
