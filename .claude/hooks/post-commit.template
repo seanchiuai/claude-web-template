@@ -1,0 +1,104 @@
+#!/bin/bash
+#
+# Post-commit hook: Suggest expert self-improvement for significant changes
+# Part of Agent Experts system - enables automatic learning
+#
+
+# Get changed files in last commit
+CHANGED_FILES=$(git diff-tree --no-commit-id --name-only -r HEAD)
+
+# Track which experts should be suggested
+SUGGEST_CONVEX=false
+SUGGEST_NEXTJS=false
+SUGGEST_SHADCN=false
+SUGGEST_VERCEL=false
+
+# Analyze changed files and determine which experts to suggest
+while IFS= read -r file; do
+  case "$file" in
+    # Convex backend changes
+    convex/*.ts)
+      SUGGEST_CONVEX=true
+      ;;
+
+    # Next.js app changes
+    app/*.tsx|app/*.ts|app/**/*.tsx|app/**/*.ts)
+      SUGGEST_NEXTJS=true
+      ;;
+
+    # Component changes (might be Next.js or shadcn)
+    components/*.tsx|components/**/*.tsx)
+      if [[ "$file" =~ components/ui/ ]]; then
+        SUGGEST_SHADCN=true
+      else
+        SUGGEST_NEXTJS=true
+      fi
+      ;;
+
+    # Tailwind/styling changes
+    app/globals.css|tailwind.config.ts|components.json)
+      SUGGEST_SHADCN=true
+      ;;
+
+    # Vercel config changes
+    next.config.ts|vercel.json|.env.example)
+      SUGGEST_VERCEL=true
+      ;;
+  esac
+done <<< "$CHANGED_FILES"
+
+# Output suggestions (only if changes detected)
+SUGGESTIONS_MADE=false
+
+if [ "$SUGGEST_CONVEX" = true ]; then
+  echo ""
+  echo "📚 Convex backend changes detected"
+  echo "💡 Consider running: /sync-expertise convex"
+  echo "   (Updates Convex expert with new patterns from convex/)"
+  SUGGESTIONS_MADE=true
+fi
+
+if [ "$SUGGEST_NEXTJS" = true ]; then
+  echo ""
+  echo "📚 Next.js changes detected"
+  echo "💡 Consider running: /sync-expertise nextjs"
+  echo "   (Updates Next.js expert with new app/ patterns)"
+  SUGGESTIONS_MADE=true
+fi
+
+if [ "$SUGGEST_SHADCN" = true ]; then
+  echo ""
+  echo "📚 UI component/styling changes detected"
+  echo "💡 Consider running: /sync-expertise shadcn"
+  echo "   (Updates shadcn expert with new component/styling patterns)"
+  SUGGESTIONS_MADE=true
+fi
+
+if [ "$SUGGEST_VERCEL" = true ]; then
+  echo ""
+  echo "📚 Deployment config changes detected"
+  echo "💡 Consider running: /sync-expertise vercel"
+  echo "   (Updates Vercel expert with new deployment patterns)"
+  SUGGESTIONS_MADE=true
+fi
+
+# Suggest syncing all if multiple domains affected
+EXPERT_COUNT=0
+[ "$SUGGEST_CONVEX" = true ] && ((EXPERT_COUNT++))
+[ "$SUGGEST_NEXTJS" = true ] && ((EXPERT_COUNT++))
+[ "$SUGGEST_SHADCN" = true ] && ((EXPERT_COUNT++))
+[ "$SUGGEST_VERCEL" = true ] && ((EXPERT_COUNT++))
+
+if [ "$EXPERT_COUNT" -ge 2 ]; then
+  echo ""
+  echo "📊 Multiple domains affected"
+  echo "💡 Or run all at once: /sync-expertise all"
+fi
+
+# Add spacing if suggestions were made
+if [ "$SUGGESTIONS_MADE" = true ]; then
+  echo ""
+fi
+
+# Exit successfully (don't block commit)
+exit 0
