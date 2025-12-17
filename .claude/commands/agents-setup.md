@@ -5,7 +5,7 @@ argument-hint: [PRD.json or doc describing what agent is in charge of]
 
 # Command: Agents Setup
 
-If not already existing, create agents and plans under .claude/agents/ for each tool in the tech stack describes in the mentioned document.
+If not already existing, create agents in the folder `.claude/agents/` for each tool in the tech stack describes in the mentioned document.
 
 Notes:
 - Agents are created with kebab-case naming: `agent-feature-name.md`

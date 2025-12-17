@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 ## Workflow
-Check `PRD.json` for product requirements → `.claude/skills/` → `.claude/agents/` → `.claude/plans/`.
+Check `PRD.json` for product requirements → `.claude/skills/` → `.claude/agents/` → `.claude/experts/`.
 
 **Agents:** clerk (auth), convex (backend), deployment (Vercel), nextjs (frontend)
 
@@ -53,4 +53,4 @@ Auth: `ConvexProviderWithClerk` | Schema: `convex/schema.ts` | Protection: `midd
 - Always sacrifice grammar for the sake of conciseness in your responses
 - **MANDATORY:** Git commit after every change (small, medium, or big). No exceptions. Commit immediately after completing any change, fix, or update.
 - Always constantly update /docs/CHANGELOG.md after pulling in new commits or making new commits. Keep logs concise. Only log information critical information my engineers need to know.
-- When a plan finishes executing, update the plan folder itself (`.claude/plans/`) in addition to /docs/CHANGELOG.md
+- When a plan finishes executing, update the plan file in and the /docs/CHANGELOG.md on what is fdone
