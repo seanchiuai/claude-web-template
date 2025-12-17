@@ -3,12 +3,30 @@ name: "shadcn/ui + Tailwind CSS"
 description: "Implementation guide for shadcn/ui components and Tailwind CSS styling"
 tools: ["npm", "filesystem"]
 color: indigo
+expertise_file: .claude/experts/shadcn-expert/expertise.yaml
 ---
 
 # shadcn/ui + Tailwind CSS Agent
 
 ## Mission
 Implement UI components using shadcn/ui and Tailwind CSS for a clean, accessible, modern interface.
+
+## Before Starting
+
+1. **Read Expertise File**
+   ```
+   Read: .claude/experts/shadcn-expert/expertise.yaml
+   ```
+   Contains installed components, styling patterns, and Tailwind conventions from this project.
+
+2. **Apply Mental Model**
+   - Check which components are already installed
+   - Review theming and styling conventions
+   - Note import patterns and utilities usage
+
+3. **Validate & Extend**
+   - Verify component availability in components/ui/
+   - Note new styling patterns for learning
 
 ## Stack Context
 - **UI Library**: shadcn/ui (copy-paste component system, not npm package)
@@ -519,3 +537,19 @@ export function BookmarkCard({
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [Radix UI Primitives](https://www.radix-ui.com/primitives)
 - [Lucide Icons](https://lucide.dev) (recommended icon library)
+
+## After Completing Task
+
+If significant UI work completed (new components, styling updates):
+
+1. **Consider Self-Improvement**
+   - Run `/sync-expertise shadcn` to update with new component and styling patterns
+   - Helps track which components installed and their usage patterns
+
+2. **What Gets Learned**
+   - Component installation patterns
+   - Styling and theming conventions
+   - Tailwind utility usage patterns
+   - Custom component patterns
+
+**Note:** Self-improvement discovers component additions and styling conventions

@@ -3,12 +3,31 @@ name: "Vercel Deployment"
 description: "Implementation guide for deploying Next.js app to Vercel"
 tools: ["npm", "filesystem", "env"]
 color: black
+expertise_file: .claude/experts/vercel-expert/expertise.yaml
 ---
 
 # Vercel Deployment Agent
 
 ## Mission
 Deploy Next.js bookmark manager to Vercel with proper environment variables, preview deployments, and production configuration.
+
+## Before Starting
+
+1. **Read Expertise File**
+   ```
+   Read: .claude/experts/vercel-expert/expertise.yaml
+   ```
+   Contains deployment patterns, environment variable conventions, and config best practices.
+
+2. **Apply Mental Model**
+   - Check required environment variables
+   - Review image domain configurations
+   - Note build script patterns
+   - Verify deployment conventions
+
+3. **Validate & Extend**
+   - Confirm env vars match current requirements
+   - Note new deployment patterns
 
 ## Stack Context
 - **Platform**: Vercel (optimized for Next.js)
@@ -513,3 +532,19 @@ const nextConfig: NextConfig = {
 - [Vercel CLI Reference](https://vercel.com/docs/cli)
 - [Environment Variables Guide](https://vercel.com/docs/projects/environment-variables)
 - [Vercel Analytics](https://vercel.com/analytics)
+
+## After Completing Task
+
+If significant deployment work (new env vars, config changes):
+
+1. **Consider Self-Improvement**
+   - Run `/sync-expertise vercel` to update with deployment patterns
+   - Helps track environment variable requirements and configuration conventions
+
+2. **What Gets Learned**
+   - Required environment variables discovered
+   - Image domain configurations
+   - Build script patterns
+   - Deployment-specific conventions
+
+**Note:** Self-improvement tracks config file changes and deployment patterns

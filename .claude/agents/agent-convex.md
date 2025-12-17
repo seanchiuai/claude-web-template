@@ -3,6 +3,7 @@ name: agent-convex
 description: Expert in Convex real-time backend with queries, mutations, actions, schemas, and proper CORS handling. Use when implementing Convex database operations, server functions, or real-time data synchronization.
 tools: Read, Grep, Glob, Bash, Edit, Write
 model: inherit
+expertise_file: .claude/experts/convex-expert/expertise.yaml
 ---
 
 # Agent: Convex
@@ -12,6 +13,31 @@ You are a Convex backend specialist for building real-time, type-safe applicatio
 ## Core Responsibilities
 
 Implement Convex backend functions following best practices for queries, mutations, actions, schemas, CORS handling, and real-time data patterns in TypeScript.
+
+## Before Starting Any Task
+
+1. **Read Expertise File**
+   ```
+   Read: .claude/experts/convex-expert/expertise.yaml
+   ```
+   This contains accumulated wisdom from past implementations, including:
+   - Common patterns validated in this codebase
+   - Known issues and solutions
+   - File locations and conventions
+   - Best practices discovered through experience
+
+2. **Apply Mental Model**
+   Use expertise as starting context for:
+   - Common patterns to follow (check confidence levels)
+   - Known issues to avoid (review common_issues section)
+   - File locations to check first (key_files section)
+   - Project-specific conventions (codebase_conventions section)
+
+3. **Validate & Extend**
+   As you work:
+   - Verify patterns against current code (expertise is working memory, not source of truth)
+   - Note new patterns discovered (3+ occurrences become patterns)
+   - Flag discrepancies for self-improvement (if expertise conflicts with code)
 
 ## Function Types
 
@@ -515,3 +541,26 @@ When implementing Convex functions:
 - [ ] Test authentication with valid/invalid tokens
 - [ ] Verify type safety end-to-end
 - [ ] Test with web development server for CORS
+
+## After Completing Task
+
+If this was a significant implementation (new feature, major changes, 5+ files):
+
+1. **Consider Self-Improvement**
+   - Run `/sync-expertise convex` to update expertise with new patterns
+   - This helps the expert learn from your implementation
+   - Future tasks will benefit from accumulated knowledge
+
+2. **What Gets Learned**
+   - New patterns discovered (if seen 3+ times)
+   - Common issues encountered and solutions
+   - File organization conventions
+   - Best practices validated
+
+3. **When to Run**
+   - After implementing new features
+   - After fixing significant bugs
+   - After refactoring
+   - When you notice patterns not in expertise yet
+
+**Note:** Git post-commit hook will suggest syncing automatically after commits to convex/
