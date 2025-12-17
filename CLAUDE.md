@@ -1,9 +1,9 @@
 # CLAUDE.md
 
 ## Workflow
-Check `PRD.json` for product requirements → `.claude/skills/` → `.claude/agents/` → `.claude/experts/`.
+Check `docs/project_requirements.md` for product requirements → `.claude/skills/` → `.claude/agents/`
 
-**Agents:** clerk (auth), convex (backend), deployment (Vercel), nextjs (frontend)
+**Agents:** convex (backend), nextjs (frontend), shadcn (UI), vercel (deployment)
 
 ## Stack & Patterns
 Next.js 15 • Tailwind 4 + shadcn/ui • Clerk → JWT → Convex • TypeScript strict • `@/*` imports
@@ -17,34 +17,34 @@ Auth: `ConvexProviderWithClerk` | Schema: `convex/schema.ts` | Protection: `midd
 
 ## Reference Docs (Read for Specific Tasks)
 
-**Creating/modifying pages or routes:**
-- Read `docs/frontend-architecture.md` - App Router structure, routing patterns, file locations
+**Project requirements and scope:**
+- Read `docs/project_requirements.md` - PRD template: features, scope, tech stack, constraints
 
-**Creating/modifying components:**
-- Read `docs/component-patterns.md` - Component structure, props, hooks, patterns
-- Read `docs/icon-usage.md` - Icon selection, sizing, colors from lucide-react
+**Tech stack decisions:**
+- Read `docs/tech_stack.md` - Frontend/backend technologies, infrastructure, integrations
 
-**Styling components:**
-- Read `docs/styling-guide.md` - Tailwind 4 colors, spacing, animations, responsive patterns
+**Frontend development:**
+- Read `docs/frontend_guidelines.md` - Architecture, design principles, components, styling, state management, routing
 
-**Convex queries/mutations:**
-- Read `docs/convex-patterns.md` - Schema, auth, queries, mutations, security patterns
+**Backend development:**
+- Read `docs/backend_structure.md` - Database schema, API design, Convex patterns, hosting, monitoring
 
-**Creating/modifying API routes:**
-- Read `docs/api-routes-guide.md` - Route structure, AI integration, validation, error handling
+**Security implementation:**
+- Read `docs/security_guidelines.md` - Auth, access control, input handling, data protection, API security
 
-**Managing state:**
-- Read `docs/state-management.md` - Local state, Convex, Context, localStorage patterns
+**User flows and interactions:**
+- Read `docs/app_flow.md` - Complete user journey, feature flows, error states
+- Read `docs/app_flowchart.md` - Visual Mermaid flowchart of app navigation
 
-**TypeScript types/interfaces:**
-- Read `docs/type-definitions.md` - Type patterns, interfaces, generics, Convex types
+**Critical changes:**
+- Update `docs/CHANGELOG.md` after commits/pulls - concise, critical info only
 
-**Always update docs/** when making significant changes. Update the above files in the `docs/` folder when patterns, APIs, or architecture changes significantly.
+**Always update docs/** when making significant changes. Fill in template sections as features are built.
 
 ## Rules
 **TS:** Strict, no `any`, `@/*` imports | **React:** Functional, `"use client"`, Convex hooks, <200 LOC | **Style:** Tailwind, mobile-first | **Security:** OWASP Top 10, row-level filter, secrets in `.env.local` | **Quality:** >80% coverage, lint clean, build pass
 
-**Convex:** Follow `docs/convex-patterns.md` exactly | **Env:** Get key from user → add to `.env.local` | **Impl:** UI first → functionality. Modular code.
+**Convex:** Follow `docs/backend_structure.md` patterns | **Env:** Get key from user → add to `.env.local` | **Impl:** UI first → functionality. Modular code.
 
 **Pre-commit:** Build + tests + lint, >80% coverage, no vulnerabilities
 
