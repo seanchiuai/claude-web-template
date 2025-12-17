@@ -4,6 +4,55 @@
 
 ## [Unreleased] - 2025-12-17
 
+### Added - Agent Experts System
+
+**Summary:**
+- Implemented complete Agent Experts framework: agents that execute AND learn
+- Created 4 domain experts (convex, nextjs, shadcn, vercel) with self-improvement capability
+- Added question/answer workflows with codebase validation
+- Integrated git hooks for automatic learning suggestions
+- Created meta-skills for building new experts and prompts
+
+**What's new:**
+- **Experts:** `.claude/experts/{name}-expert/` with expertise.yaml, question.md, self-improve.md
+- **Commands:** `/ask-expert [domain] "question"` and `/sync-expertise [domain]`
+- **Git Hook:** `.git/hooks/post-commit` suggests self-improvement after commits
+- **Meta-Skills:** `creating-expert` and `meta-prompt` for tools-that-build-tools
+- **Documentation:** `docs/agent_experts.md` comprehensive guide
+
+**Key features:**
+- Ask questions, get answers with evidence (file:line references)
+- Expertise files track patterns, issues, conventions with confidence levels
+- Self-improvement syncs mental models with codebase changes
+- Automatic learning via git hook suggestions
+- Pattern detection: 3+ occurrences = add pattern, 5+ = high confidence
+
+**How to use:**
+```bash
+/ask-expert convex "How do I handle CORS?"        # Ask questions
+/sync-expertise convex                            # Update expertise
+/sync-expertise all                               # Update all experts
+```
+
+**Files affected:**
+- `.claude/experts/` - New expert system (4 experts + shared templates)
+- `.claude/commands/` - New: ask-expert.md, sync-expertise.md
+- `.claude/agents/` - Enhanced with expertise references
+- `.claude/skills/` - New: creating-expert, meta-prompt
+- `.claude/hooks/` - New: post-commit.template
+- `.git/hooks/post-commit` - Installed
+- `CLAUDE.md` - Added Agent Experts section
+- `docs/agent_experts.md` - New comprehensive documentation
+
+**Important notes:**
+- Expertise is working memory, codebase is source of truth - always validate
+- Run self-improve after significant changes to keep expertise current
+- Git hook suggests syncing automatically after domain-specific commits
+- Low confidence initially, improves with usage and self-improvement runs
+- Meta-skills enable rapid creation of new experts for additional domains
+
+---
+
 ### Changed - README Enhancement
 
 **Summary:**

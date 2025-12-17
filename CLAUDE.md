@@ -5,6 +5,39 @@ Check `docs/project_requirements.md` for product requirements → `.claude/skill
 
 **Agents:** convex (backend), nextjs (frontend), shadcn (UI), vercel (deployment)
 
+## Agent Experts (Self-Improving Agents)
+
+**Pattern:** Agents that execute AND learn (not execute and forget)
+
+**Ask Questions:**
+```bash
+/ask-expert convex "How do I handle CORS?"
+/ask-expert nextjs "What's the Server Component pattern?"
+/ask-expert shadcn "How do I use Button?"
+/ask-expert vercel "How do I deploy?"
+```
+
+**Update Expertise:**
+```bash
+/sync-expertise convex    # After convex/ changes
+/sync-expertise all       # After major refactoring
+```
+
+**How It Works:**
+- Each expert has expertise file (`.claude/experts/{name}-expert/expertise.yaml`)
+- Expertise = accumulated patterns validated against codebase
+- Questions answered with evidence (file:line references)
+- Self-improvement syncs expertise with code changes
+- Git hook suggests syncing after commits
+
+**Key Insight:** Expertise is working memory, codebase is source of truth. Always validate.
+
+**Meta-Skills:**
+- `creating-expert` - Generate new domain experts
+- `meta-prompt` - Create prompt variations
+
+**Read:** `docs/agent_experts.md` for full documentation
+
 ## Stack & Patterns
 Next.js 15 • Tailwind 4 + shadcn/ui • Clerk → JWT → Convex • TypeScript strict • `@/*` imports
 
