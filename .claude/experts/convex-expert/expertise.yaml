@@ -1,0 +1,107 @@
+---
+expert: "convex-expert"
+domain: "Convex Backend Development"
+last_updated: "2025-12-17T13:30:00Z"
+version: "0.1.0"
+confidence: "low"
+---
+
+# Core Knowledge
+# Patterns extracted from agent-convex.md - to be validated against codebase
+
+convex_patterns:
+  - pattern: "Use queries for reads, mutations for writes, actions for side effects"
+    context: "Convex function type separation"
+    evidence: ".claude/agents/agent-convex.md:16-97"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+  - pattern: "Schedule actions from mutations, never call directly"
+    context: "Asynchronous side effects pattern"
+    evidence: ".claude/agents/agent-convex.md:100-124"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+  - pattern: "CORS headers required for HTTP endpoints"
+    context: "Web development with browser requests"
+    evidence: ".claude/agents/agent-convex.md:209-296"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+  - pattern: "Always use ctx.storage.getUrl() for storage URLs"
+    context: "File storage URL generation"
+    evidence: ".claude/agents/agent-convex.md:300-308"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Use .convex.site for HTTP endpoints, not .convex.cloud"
+    context: "Frontend HTTP endpoint URLs"
+    evidence: ".claude/agents/agent-convex.md:312-334"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+# Common Issues & Solutions
+# Known issues from agent documentation - to be validated
+
+common_issues:
+  - problem: "CORS policy blocked in browser"
+    solution: "Add CORS_HEADERS constant to all HTTP endpoint responses, including OPTIONS"
+    frequency: "high"
+    evidence: ".claude/agents/agent-convex.md:219-225"
+    last_seen: "2025-12-17"
+
+  - problem: "Storage URL returns null"
+    solution: "Always use ctx.storage.getUrl(), never manual URL construction"
+    frequency: "medium"
+    evidence: ".claude/agents/agent-convex.md:301-308"
+    last_seen: "2025-12-17"
+
+  - problem: "401 Unauthorized on HTTP endpoints"
+    solution: "Check Bearer token format and verify Clerk JWT configuration"
+    frequency: "medium"
+    evidence: ".claude/agents/agent-convex.md:238-252"
+    last_seen: "2025-12-17"
+
+  - problem: "404 Not Found on HTTP endpoints"
+    solution: "Replace .convex.cloud with .convex.site in endpoint URLs"
+    frequency: "high"
+    evidence: ".claude/agents/agent-convex.md:318"
+    last_seen: "2025-12-17"
+
+# File Locations
+# Key Convex files - to be validated against actual codebase
+
+key_files:
+  schema: "convex/schema.ts"
+  http_routes: "convex/http.ts"
+  auth_config: "convex/auth.config.ts"
+  common_patterns: []  # To be populated by self-improve
+
+# Project-Specific Insights
+# To be discovered through codebase exploration
+
+codebase_conventions: []  # Empty - will be populated by self-improve
+
+# Evolution Log
+# Track how mental model changes over time
+
+evolution_log:
+  - date: "2025-12-17"
+    change: "Initial expertise created from agent-convex.md documentation"
+    confidence_before: "none"
+    confidence_after: "low"
+    trigger: "manual initialization"
+
+# Metadata
+# System tracking information
+
+metadata:
+  created: "2025-12-17"
+  self_improve_runs: 0
+  last_self_improve: "never"
+  questions_answered: 0
