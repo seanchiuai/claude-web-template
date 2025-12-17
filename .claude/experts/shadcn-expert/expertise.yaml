@@ -1,0 +1,83 @@
+---
+expert: "shadcn-expert"
+domain: "shadcn/ui + Tailwind CSS"
+last_updated: "2025-12-17T14:00:00Z"
+version: "0.1.0"
+confidence: "low"
+---
+
+# Core Knowledge
+
+shadcn_patterns:
+  - pattern: "shadcn/ui is copy-paste, not npm install"
+    context: "Component installation method"
+    evidence: ".claude/agents/agent-shadcn.md:14"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+  - pattern: "Use npx shadcn@latest add [component]"
+    context: "Adding new UI components"
+    evidence: ".claude/agents/agent-shadcn.md:26-28"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Components use CSS variables for theming"
+    context: "Styling and customization"
+    evidence: ".claude/agents/agent-shadcn.md:34, 64-98"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Import from @/components/ui/[component]"
+    context: "Component imports"
+    evidence: ".claude/agents/agent-shadcn.md"
+    learned_from: "Agent documentation review"
+    importance: "medium"
+    confidence: "low"
+
+# Common Issues
+
+common_issues:
+  - problem: "Component not found after installation"
+    solution: "Check components/ui/ directory, verify @/* import alias configured"
+    frequency: "medium"
+    evidence: ".claude/agents/agent-shadcn.md:34"
+    last_seen: "2025-12-17"
+
+  - problem: "Styling not applied"
+    solution: "Verify Tailwind config includes component paths, check globals.css has CSS variables"
+    frequency: "medium"
+    evidence: ".claude/agents/agent-shadcn.md:50-62"
+    last_seen: "2025-12-17"
+
+# File Locations
+
+key_files:
+  components: "components/ui/"
+  globals_css: "app/globals.css"
+  tailwind_config: "tailwind.config.ts"
+  lib_utils: "lib/utils.ts"
+  common_patterns: []
+
+# Project-Specific Insights
+
+codebase_conventions: []
+
+# Evolution Log
+
+evolution_log:
+  - date: "2025-12-17"
+    change: "Initial expertise created from agent-shadcn.md documentation"
+    confidence_before: "none"
+    confidence_after: "low"
+    trigger: "manual initialization"
+
+# Metadata
+
+metadata:
+  created: "2025-12-17"
+  self_improve_runs: 0
+  last_self_improve: "never"
+  questions_answered: 0

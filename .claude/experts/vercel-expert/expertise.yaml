@@ -1,0 +1,83 @@
+---
+expert: "vercel-expert"
+domain: "Vercel Deployment"
+last_updated: "2025-12-17T14:00:00Z"
+version: "0.1.0"
+confidence: "low"
+---
+
+# Core Knowledge
+
+vercel_patterns:
+  - pattern: "Environment variables must be set in Vercel dashboard"
+    context: "Production deployment configuration"
+    evidence: ".claude/agents/agent-vercel.md:74-100"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+  - pattern: "Use NEXT_PUBLIC_ prefix for client-side env vars"
+    context: "Environment variable visibility"
+    evidence: ".claude/agents/agent-vercel.md:77-91"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Configure image domains in next.config.ts"
+    context: "Next.js Image optimization"
+    evidence: ".claude/agents/agent-vercel.md:48-64"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Git push triggers automatic deployment"
+    context: "CI/CD workflow"
+    evidence: ".claude/agents/agent-vercel.md:18"
+    learned_from: "Agent documentation review"
+    importance: "medium"
+    confidence: "low"
+
+# Common Issues
+
+common_issues:
+  - problem: "Build fails with missing environment variables"
+    solution: "Add all required vars to Vercel dashboard, check NEXT_PUBLIC_ prefix for client vars"
+    frequency: "high"
+    evidence: ".claude/agents/agent-vercel.md:74-100"
+    last_seen: "2025-12-17"
+
+  - problem: "Images not loading in production"
+    solution: "Add image domains to next.config.ts remotePatterns"
+    frequency: "medium"
+    evidence: ".claude/agents/agent-vercel.md:48-64"
+    last_seen: "2025-12-17"
+
+# File Locations
+
+key_files:
+  config: "next.config.ts"
+  env_example: ".env.example"
+  vercel_json: "vercel.json"
+  package_json: "package.json"
+  common_patterns: []
+
+# Project-Specific Insights
+
+codebase_conventions: []
+
+# Evolution Log
+
+evolution_log:
+  - date: "2025-12-17"
+    change: "Initial expertise created from agent-vercel.md documentation"
+    confidence_before: "none"
+    confidence_after: "low"
+    trigger: "manual initialization"
+
+# Metadata
+
+metadata:
+  created: "2025-12-17"
+  self_improve_runs: 0
+  last_self_improve: "never"
+  questions_answered: 0

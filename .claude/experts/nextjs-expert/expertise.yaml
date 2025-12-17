@@ -1,0 +1,100 @@
+---
+expert: "nextjs-expert"
+domain: "Next.js App Router Development"
+last_updated: "2025-12-17T14:00:00Z"
+version: "0.1.0"
+confidence: "low"
+---
+
+# Core Knowledge
+# Patterns extracted from agent-nextjs.md - to be validated against codebase
+
+nextjs_patterns:
+  - pattern: "Server Components are default, Client Components need 'use client'"
+    context: "Next.js App Router component types"
+    evidence: ".claude/agents/agent-nextjs.md:19-58"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+  - pattern: "Async Server Components for data fetching"
+    context: "Data loading in App Router"
+    evidence: ".claude/agents/agent-nextjs.md:19-38"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Pass data from Server to Client Components via props"
+    context: "Component data flow"
+    evidence: ".claude/agents/agent-nextjs.md:60-94"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "useRouter/usePathname/useSearchParams only in Client Components"
+    context: "Navigation hooks"
+    evidence: ".claude/agents/agent-nextjs.md:127-150"
+    learned_from: "Agent documentation review"
+    importance: "high"
+    confidence: "low"
+
+  - pattern: "Params must be awaited in Next.js 15+"
+    context: "Dynamic route parameters"
+    evidence: ".claude/agents/agent-nextjs.md:66-73"
+    learned_from: "Agent documentation review"
+    importance: "critical"
+    confidence: "low"
+
+# Common Issues & Solutions
+# Known issues from agent documentation - to be validated
+
+common_issues:
+  - problem: "Can't use useState/useEffect in Server Components"
+    solution: "Add 'use client' directive at top of file"
+    frequency: "high"
+    evidence: ".claude/agents/agent-nextjs.md:42-57"
+    last_seen: "2025-12-17"
+
+  - problem: "Navigation hooks not found"
+    solution: "Import from 'next/navigation' (not 'next/router'), only use in Client Components"
+    frequency: "medium"
+    evidence: ".claude/agents/agent-nextjs.md:132"
+    last_seen: "2025-12-17"
+
+  - problem: "Params is Promise error"
+    solution: "Await params in Next.js 15+: const { id } = await params;"
+    frequency: "high"
+    evidence: ".claude/agents/agent-nextjs.md:66-73"
+    last_seen: "2025-12-17"
+
+# File Locations
+# Key Next.js files - to be validated against actual codebase
+
+key_files:
+  root_layout: "app/layout.tsx"
+  root_page: "app/page.tsx"
+  middleware: "middleware.ts"
+  config: "next.config.ts"
+  common_patterns: []  # To be populated by self-improve
+
+# Project-Specific Insights
+# To be discovered through codebase exploration
+
+codebase_conventions: []  # Empty - will be populated by self-improve
+
+# Evolution Log
+
+evolution_log:
+  - date: "2025-12-17"
+    change: "Initial expertise created from agent-nextjs.md documentation"
+    confidence_before: "none"
+    confidence_after: "low"
+    trigger: "manual initialization"
+
+# Metadata
+
+metadata:
+  created: "2025-12-17"
+  self_improve_runs: 0
+  last_self_improve: "never"
+  questions_answered: 0
