@@ -4,6 +4,18 @@
 
 ## [Unreleased] - 2025-12-17
 
+### Removed - Template Cleanup
+
+**Summary:**
+- Cleaned up root folder for template repository
+- Removed test-ui.js (Playwright test script)
+- Removed .DS_Store (macOS system file)
+
+**What's affected:**
+- Root folder structure now cleaner for template use
+
+---
+
 ### Changed - Documentation Structure
 
 **Summary:**
