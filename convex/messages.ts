@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const addMessage = mutation({
@@ -14,5 +14,22 @@ export const addMessage = mutation({
       content: args.content,
       createdAt: Date.now(),
     });
+  },
+});
+
+export const getUserMessages = query({
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      return [];
+    }
+
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_user", (q) => q.eq("userId", identity.subject))
+      .order("desc")
+      .collect();
+
+    return messages;
   },
 });
