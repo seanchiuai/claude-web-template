@@ -1,0 +1,74 @@
+---
+# Expertise File Schema Template
+# This is the standard structure for all expert expertise files
+# Copy and customize for each domain expert
+
+expert: "expert-name"              # e.g., "convex-expert", "nextjs-expert"
+domain: "Domain Description"       # e.g., "Convex Backend Development"
+last_updated: "2025-12-17T00:00:00Z"
+version: "0.1.0"                   # Semantic versioning: increment on updates
+confidence: "low"                  # low | medium | high (overall expertise confidence)
+---
+
+# Core Knowledge
+# High-level patterns and principles discovered through experience
+# Add new patterns when seen 3+ times in codebase
+
+domain_patterns:
+  - pattern: "Description of pattern"
+    context: "When this pattern applies"
+    evidence: "file/path.ts:line-range"
+    learned_from: "How this was discovered"
+    importance: "critical | high | medium | low"
+    confidence: "high | medium | low"
+
+# Common Issues & Solutions
+# Problems encountered and validated solutions
+# Track frequency to identify recurring pain points
+
+common_issues:
+  - problem: "Description of issue"
+    solution: "How to solve it"
+    frequency: "high | medium | low"
+    evidence: "file/path.ts:line or docs reference"
+    last_seen: "YYYY-MM-DD"
+
+# File Locations
+# Key files discovered through exploration
+# Updated frequently as codebase evolves
+
+key_files:
+  primary_config: "path/to/config.ts"
+  main_implementation: "path/to/main.ts"
+  common_patterns:
+    - "path/to/pattern1.ts"
+    - "path/to/pattern2.ts"
+
+# Project-Specific Insights
+# Learned patterns from this specific codebase
+# Distinguishes project conventions from general best practices
+
+codebase_conventions:
+  - convention: "Description of convention"
+    evidence: "Where this pattern is seen (X files)"
+    confidence: "high | medium | low"
+
+# Evolution Log
+# Track how mental model has changed over time
+# Provides audit trail of learning
+
+evolution_log:
+  - date: "YYYY-MM-DD"
+    change: "What changed in this update"
+    confidence_before: "low | medium | high"
+    confidence_after: "low | medium | high"
+    trigger: "What caused this update (commit, self-improve, manual)"
+
+# Metadata
+# System information (do not modify manually)
+
+metadata:
+  created: "YYYY-MM-DD"
+  self_improve_runs: 0
+  last_self_improve: "YYYY-MM-DD"
+  questions_answered: 0
