@@ -4,6 +4,50 @@
 
 ## [Unreleased] - 2025-12-17
 
+### Changed - README Enhancement
+
+**Summary:**
+- Completely rewrote README.md for easier onboarding
+- Added comprehensive Claude Code integration documentation
+- Included documentation templates overview
+- Streamlined quick start instructions
+
+**What's new in README:**
+- ✨ What's Included section highlighting all template features
+- 🤖 Claude Code Integration section with agents/commands/skills
+- 📚 Documentation section with table of all docs/ templates
+- 📁 Complete project structure visualization
+- 🎯 Next Steps guide for new users
+- 📝 Development Workflow recommendations
+
+**What's improved:**
+- Clearer quick start (Option A: Manual, Option B: Claude Code)
+- Better organization with emoji headers for scannability
+- Reference links to detailed docs instead of repeating info
+- Highlights Claude Code as first-class development tool
+- More concise while being more comprehensive
+
+**Files affected:**
+- README.md - Complete rewrite
+
+---
+
+### Documentation - update-CLAUDE Command Executed
+
+**Summary:**
+- Ran `/update-CLAUDE` command to verify CLAUDE.md accuracy
+- Confirmed CLAUDE.md already reflects recent template restructuring
+- Documentation structure validated against git history
+
+**What's verified:**
+- CLAUDE.md references correct doc paths (project_requirements, tech_stack, frontend_guidelines, backend_structure, security_guidelines, app_flow, app_flowchart)
+- Workflow section accurate (agents: convex, nextjs, shadcn, vercel)
+- No updates needed - CLAUDE.md already current
+
+---
+
+## Changes History - 2025-12-17
+
 ### Removed - Template Cleanup
 
 **Summary:**
