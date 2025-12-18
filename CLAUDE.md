@@ -4,7 +4,7 @@
 ## Experts
 `/ask-expert {convex|nextjs|shadcn|vercel} "question"` → `/sync-expertise {agent|all}` after changes
 
-Experts accumulate patterns in `.claude/experts/{name}-expert/expertise.yaml`
+Patterns: `.claude/experts/{name}-expert/expertise.yaml` | **On session start:** Check `.claude/pending-syncs.txt` → run syncs → delete file
 
 ## Stack
 Next.js 15 • Tailwind 4 • shadcn/ui • Clerk→JWT→Convex • TS strict • `@/*` imports
