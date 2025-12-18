@@ -2,6 +2,52 @@
 
 > **Purpose**: Track critical changes engineers need to know. Keep concise, update after commits/pulls.
 
+## [Unreleased] - 2025-12-18
+
+### Changed - README Comprehensive Update
+
+**Summary:**
+- Enhanced README with extensive AI development environment customization guide
+- Added step-by-step instructions for adapting experts and agents to different tech stacks
+- Included 5 common customization workflows with complete examples
+- Added expert quality indicators and troubleshooting section
+
+**What's new in README:**
+- 🧠 Customizing AI Development Environment section (350+ lines)
+- Initial Expert Sync instructions (critical first-time setup)
+- Complete guide to using `/ask-expert` and `/sync-expertise`
+- Instructions for modifying existing experts or creating new ones
+- Manual expert creation walkthrough with YAML structure
+- Custom slash commands and skills creation guide
+- Expert evolution tracking and quality indicators
+- 5 detailed workflows: adapting tech stack, adding experts, teaching patterns, custom commands, monthly maintenance
+- Troubleshooting guide for AI development issues
+
+**What's improved:**
+- Quick Start now includes Step 4: Sync AI Experts (critical for AI development)
+- Clear explanation of when/why to sync experts
+- Practical examples for different tech stacks (Django, PostgreSQL, React)
+- Evidence-based expert response format explanation
+- Expert confidence progression timeline (Day 1 → Day 90)
+
+**Use cases covered:**
+- Switching from Convex to Supabase/Django/other backend
+- Creating experts for new technologies (Stripe, custom frameworks)
+- Teaching experts project-specific coding patterns
+- Building custom workflows and commands
+- Monitoring expert quality and improvement over time
+
+**Files affected:**
+- README.md - Major expansion (+350 lines, comprehensive customization guide)
+
+**Important for users:**
+- README now serves as complete guide for customizing template to any tech stack
+- Users can adapt template without reading additional docs
+- Clear instructions prevent common setup mistakes (forgetting initial expert sync)
+- Workflows provide copy-paste commands for common scenarios
+
+---
+
 ## [Unreleased] - 2025-12-17
 
 ### Added - Agent Experts System

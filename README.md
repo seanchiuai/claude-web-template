@@ -53,7 +53,25 @@ If you're using Claude Code:
 ```
 This will walk you through the entire setup process interactively.
 
-### 4. Run Development Server
+### 4. Sync AI Experts (Critical for AI Development)
+
+**If using Claude Code:**
+
+After setup, sync the AI experts with your codebase so they can learn your patterns:
+
+```bash
+/sync-expertise all
+```
+
+This takes 2-4 minutes and:
+- Validates expert knowledge against your actual code
+- Discovers project-specific patterns
+- Enables evidence-based answers to your questions
+- Allows experts to suggest YOUR conventions (not generic ones)
+
+**Skip this if:** You're not using Claude Code or AI-assisted development.
+
+### 5. Run Development Server
 
 **Important**: Run this command in your own terminal (not through AI):
 
@@ -251,6 +269,351 @@ Convex auto-deploys when you push to main. Configure in Convex Dashboard → Set
 
 See [`tech_stack.md`](./docs/tech_stack.md) for deployment details.
 
+## 🧠 Customizing AI Development Environment
+
+This template includes an intelligent Agent Experts system that learns and evolves with your codebase. Here's how to customize it for your project.
+
+### Understanding the Expert System
+
+**Agent Experts** are AI assistants specialized in different domains of your tech stack. They:
+- Learn patterns from your actual codebase
+- Answer questions with evidence-based responses
+- Improve over time through self-learning
+- Maintain a "mental model" of your project conventions
+
+### Initial Expert Sync
+
+**On First Use (Critical):**
+
+When you first clone this template, the experts have only basic knowledge from their agent documentation. You MUST sync them with your codebase:
+
+```bash
+# Sync all experts with your codebase
+/sync-expertise all
+```
+
+This explores your project and validates patterns. Run this:
+- After cloning the template
+- After significant code changes (5+ files)
+- After major refactoring
+- Monthly for maintenance
+
+**What happens during sync:**
+- Experts explore relevant directories (convex/, app/, components/)
+- Validate existing patterns against actual code
+- Discover new project-specific conventions
+- Update confidence levels based on evidence
+- Learn your coding style and patterns
+
+### Using Experts
+
+**Ask Questions:**
+
+```bash
+# Backend/database questions
+/ask-expert convex "How do I handle CORS in HTTP endpoints?"
+
+# Frontend/routing questions
+/ask-expert nextjs "What's the pattern for Server Components with auth?"
+
+# UI component questions
+/ask-expert shadcn "How do I use the Button component?"
+
+# Deployment questions
+/ask-expert vercel "How do I deploy?"
+```
+
+**Expert responses include:**
+- Direct, actionable answer
+- Evidence from YOUR codebase (file paths, line numbers)
+- Project-specific patterns and conventions
+- Confidence level with reasoning
+- Related patterns to explore
+
+### Customizing Experts for Your Stack
+
+**Scenario: You're using a different tech stack**
+
+If you're not using the default stack (Next.js + Convex + shadcn + Vercel), customize the experts:
+
+#### Option 1: Modify Existing Experts
+
+Edit agent files to match your stack:
+
+```bash
+# Example: Switch from Convex to Supabase
+1. Edit: .claude/agents/agent-convex.md → agent-supabase.md
+2. Update domain knowledge and patterns
+3. Edit: .claude/experts/convex-expert/ → supabase-expert/
+4. Update expertise.yaml with Supabase patterns
+5. Run: /sync-expertise supabase
+```
+
+#### Option 2: Create New Experts
+
+Use the built-in creator tools:
+
+```bash
+# Create a new expert (interactive)
+@creating-expert
+
+# This walks you through:
+# 1. Expert name (e.g., "django-expert")
+# 2. Domain (e.g., "Django Backend Development")
+# 3. Key patterns to track
+# 4. File locations to monitor
+# 5. Initial expertise structure
+```
+
+**Manual Creation:**
+
+1. **Create expert directory:**
+   ```bash
+   mkdir -p .claude/experts/[your-expert-name]-expert
+   ```
+
+2. **Create expertise.yaml:**
+   ```yaml
+   ---
+   expert: "your-expert-name"
+   domain: "Your Domain Description"
+   last_updated: "2025-12-18T00:00:00Z"
+   version: "0.1.0"
+   confidence: "low"
+   ---
+
+   patterns:
+     - pattern: "Your pattern description"
+       context: "When this pattern applies"
+       evidence: "file.ts:123"
+       importance: "critical"
+       confidence: "low"
+
+   key_files:
+     main_config: "path/to/config.ts"
+
+   common_issues: []
+   codebase_conventions: []
+   evolution_log: []
+   ```
+
+3. **Create workflows:**
+   - `question.md` - How expert answers questions
+   - `self-improve.md` - How expert learns from code
+
+4. **Create agent file:**
+   ```bash
+   # .claude/agents/agent-[your-expert].md
+   ```
+   Define tools, patterns, and best practices
+
+5. **Sync the new expert:**
+   ```bash
+   /sync-expertise your-expert-name
+   ```
+
+### Adapting Agents
+
+**Agents** are the implementation workers that write code. Customize them:
+
+**Edit existing agents:**
+```bash
+# Example: Customize Next.js agent for your patterns
+Edit: .claude/agents/agent-nextjs.md
+
+# Add your conventions:
+- File organization rules
+- Naming conventions
+- Error handling patterns
+- Import organization
+- Testing requirements
+```
+
+**Create new agents:**
+```bash
+# Use the agent builder
+@agent-builder
+
+# Or create manually:
+# .claude/agents/agent-[name].md
+```
+
+### Custom Slash Commands
+
+Add project-specific workflows:
+
+```bash
+# Create new command file
+# .claude/commands/your-command.md
+
+---
+description: What your command does
+argument-hint: [arg1] [arg2]
+---
+
+# Your command implementation
+# Can use any tools: Read, Grep, Glob, Bash, etc.
+```
+
+**Example custom commands:**
+- `/deploy-staging` - Deploy to staging environment
+- `/run-migrations` - Run database migrations
+- `/generate-types` - Generate TypeScript types from schema
+- `/backup-db` - Backup database before changes
+
+### Evolution Tracking
+
+Monitor how your experts improve over time:
+
+```bash
+# View expert's mental model
+Read: .claude/experts/convex-expert/expertise.yaml
+
+# Check evolution log
+# Shows confidence growth, patterns learned, changes over time
+```
+
+**Healthy expert progression:**
+```
+Day 1:   version: 0.1.0, confidence: low,    patterns: 5
+Day 7:   version: 0.3.0, confidence: medium, patterns: 12
+Day 30:  version: 0.8.0, confidence: high,   patterns: 25
+Day 90:  version: 1.2.0, confidence: high,   patterns: 35
+```
+
+### Expert Sync Workflow
+
+**Automatic sync suggestions:**
+
+The template can suggest syncs after commits (via git hooks):
+
+```bash
+# After commit with backend changes
+git commit -m "Add new Convex endpoint"
+
+# Hook output:
+📚 Convex changes detected
+💡 Consider: /sync-expertise convex
+```
+
+**Manual sync triggers:**
+
+```bash
+# Single expert
+/sync-expertise convex
+
+# All experts
+/sync-expertise all
+```
+
+**Best practices:**
+- ✅ Sync after merging features
+- ✅ Sync before asking questions (for freshest answers)
+- ✅ Sync monthly for maintenance
+- ❌ Don't sync after every commit (too frequent)
+- ❌ Don't sync during active development
+
+### Template for Different Projects
+
+**Example: Adapt for Django + PostgreSQL + React**
+
+1. **Remove unused experts:**
+   ```bash
+   rm -rf .claude/experts/convex-expert
+   rm -rf .claude/experts/nextjs-expert
+   ```
+
+2. **Create new experts:**
+   ```bash
+   @creating-expert  # Create "django-expert"
+   @creating-expert  # Create "postgres-expert"
+   @creating-expert  # Create "react-expert"
+   ```
+
+3. **Update CLAUDE.md:**
+   ```markdown
+   ## Stack
+   Django 5 • PostgreSQL • React 18 • TypeScript
+
+   ## Experts
+   `/ask-expert {django|postgres|react} "question"`
+   ```
+
+4. **Sync all experts:**
+   ```bash
+   /sync-expertise all
+   ```
+
+5. **Update agents:**
+   - Edit `.claude/agents/` to match your patterns
+   - Remove skills you don't need
+   - Add new skills for your stack
+
+### Creating Skills
+
+**Skills** are specialized workflows for complex tasks:
+
+```bash
+# Use the skill creator
+@create-skill
+
+# Or create manually:
+# .claude/skills/[skill-name]/skill.md
+```
+
+**Example skills for your project:**
+- `@database-migration` - Handle schema migrations
+- `@api-endpoint` - Create new API endpoints following your patterns
+- `@component-generator` - Generate components with your structure
+- `@testing-suite` - Add comprehensive tests
+
+### Project-Specific Conventions
+
+**Teach experts your patterns:**
+
+After writing code with specific patterns, sync experts to learn:
+
+```bash
+# Example: You always use a specific error handling pattern
+# 1. Implement it consistently across 5+ files
+# 2. Sync the expert
+/sync-expertise convex
+
+# 3. Expert learns: "All mutations use try-catch with custom error codes"
+# 4. Next time you ask, expert suggests YOUR pattern
+```
+
+**Document in expertise.yaml:**
+```yaml
+codebase_conventions:
+  - convention: "All mutations return { success, data, error }"
+    evidence: "convex/users.ts:45, convex/tasks.ts:67, ..."
+    confidence: "high"
+```
+
+### Troubleshooting AI Development
+
+**Expert gives outdated answers:**
+```bash
+/sync-expertise [expert-name]  # Refresh their knowledge
+```
+
+**Expert low confidence:**
+- Normal for new patterns (< 3 occurrences)
+- Implement pattern in more places
+- Run sync again to increase confidence
+
+**Expert not finding pattern:**
+- Pattern doesn't exist yet in codebase
+- Expert will help you implement it
+
+**YAML syntax error in expertise:**
+```bash
+# Fix manually or restore from git
+git checkout .claude/experts/[expert-name]/expertise.yaml
+# Then re-run sync
+```
+
 ## 🆘 Troubleshooting
 
 ### Common Issues
@@ -316,6 +679,150 @@ After setup is complete:
 4. Commit frequently (template encourages atomic commits)
 5. Update `docs/CHANGELOG.md` after significant changes
 6. Use `/update-CLAUDE` to keep AI context current
+
+## 🔄 Common Customization Workflows
+
+### Workflow 1: Adapting for a New Tech Stack
+
+```bash
+# 1. Clone template
+git clone <repo-url> my-project
+cd my-project
+
+# 2. Run initial setup
+/setup
+
+# 3. Remove default experts you don't need
+rm -rf .claude/experts/convex-expert  # If not using Convex
+rm -rf .claude/experts/vercel-expert  # If not using Vercel
+
+# 4. Create experts for your stack
+@creating-expert  # Interactive creation
+
+# 5. Update CLAUDE.md with your stack info
+Edit: CLAUDE.md
+
+# 6. Update agents to match your patterns
+Edit: .claude/agents/agent-*.md
+
+# 7. Sync all experts with your codebase
+/sync-expertise all
+
+# 8. Start development
+npm run dev
+```
+
+### Workflow 2: Adding a New Expert to Existing Project
+
+```bash
+# 1. Create the expert
+@creating-expert
+
+# 2. Follow prompts to define:
+#    - Expert name (e.g., "stripe-expert")
+#    - Domain (e.g., "Stripe Payment Integration")
+#    - Key patterns to track
+#    - File locations
+
+# 3. Create workflows (or use templates)
+# .claude/experts/stripe-expert/question.md
+# .claude/experts/stripe-expert/self-improve.md
+
+# 4. Create corresponding agent
+# .claude/agents/agent-stripe.md
+
+# 5. Sync to learn from existing code
+/sync-expertise stripe
+
+# 6. Test it
+/ask-expert stripe "How do I handle webhooks?"
+```
+
+### Workflow 3: Teaching Experts Your Coding Style
+
+```bash
+# 1. Write code following your preferred patterns
+# Implement consistently across 5+ files
+
+# 2. Sync expert to learn your patterns
+/sync-expertise [expert-name]
+
+# 3. Verify expert learned the pattern
+/ask-expert [expert-name] "What's the pattern for [your-pattern]?"
+
+# 4. Expert should respond with YOUR pattern as evidence
+# Include: file paths, confidence level, recommendations
+
+# 5. Keep syncing as patterns evolve
+# After major changes: /sync-expertise all
+```
+
+### Workflow 4: Creating Project-Specific Commands
+
+```bash
+# 1. Create command file
+# .claude/commands/my-command.md
+
+# 2. Define behavior
+---
+description: Brief description
+argument-hint: [optional-args]
+---
+
+# Command implementation using tools
+
+# 3. Use it
+/my-command [args]
+
+# Example: Database backup command
+# .claude/commands/backup-db.md
+# Implementation: Uses Bash to run backup script
+# Usage: /backup-db production
+```
+
+### Workflow 5: Monthly Maintenance
+
+```bash
+# Run monthly to keep experts sharp
+
+# 1. Update all experts with latest patterns
+/sync-expertise all
+
+# 2. Review expert evolution
+Read: .claude/experts/*/expertise.yaml
+# Check: version numbers, confidence levels, pattern count
+
+# 3. Clean up outdated patterns
+# Experts auto-remove patterns not found
+# Review evolution_log for changes
+
+# 4. Update CLAUDE.md if stack changed
+Edit: CLAUDE.md
+
+# 5. Test experts with questions
+/ask-expert convex "Show me our error handling pattern"
+/ask-expert nextjs "What's our layout structure?"
+```
+
+## 📊 Expert Quality Indicators
+
+**High-Quality Expert:**
+- ✅ Version 1.0+ (mature)
+- ✅ Confidence: high
+- ✅ 25+ validated patterns
+- ✅ Evidence from 10+ files
+- ✅ Recent sync (< 30 days)
+- ✅ Active evolution log
+
+**Needs Attention:**
+- ⚠️ Version < 0.5 (immature)
+- ⚠️ Confidence: low
+- ⚠️ < 10 patterns
+- ⚠️ Evidence from < 5 files
+- ⚠️ Last sync > 60 days
+- ⚠️ Empty evolution log
+
+**Action:** Run `/sync-expertise [expert]` to improve quality
 
 ## 📄 License
 
