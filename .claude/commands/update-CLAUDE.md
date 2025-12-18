@@ -111,6 +111,8 @@ Add a "Recent Updates" section with:
 - **Keep it concise**: Summarize rather than listing every small change
 - **Maintain structure**: Follow existing CLAUDE.md organization
 - **Add timestamps**: Note when major updates were made
+- **Grammar**: Sacrifise grammar for the sake of conciseness
+
 
 ## 5. Output Format
 Provide the complete updated CLAUDE.md content, organized as:
@@ -139,5 +141,21 @@ Provide the complete updated CLAUDE.md content, organized as:
 ## Recent Updates (Updated: YYYY-MM-DD)
 [Summary of recent changes]
 
-## Important Notes
-[Key information for developers]
+## Rules
+- **TS:** Strict, no `any`, `@/*` imports
+- **React:** Functional, `"use client"`, Convex hooks, <200 LOC
+- **Style:** Tailwind, mobile-first
+- **Security:** OWASP Top 10, row-level filter, secrets in `.env.local`
+- **Quality:** >80% coverage, lint clean, build pass
+- **Pre-commit:** Build + tests + lint, >80% coverage, no vulnerabilities
+[More rules]
+
+## Crucial Notes (ALWAYS CHECK)
+- No backwards compatibility
+- Sacrifice grammar for conciseness
+- **MANDATORY:** Commit after every change
+- Update `/docs/CHANGELOG.md` after commits/pulls
+- Update plan files (if any)
+- UI first → functionality. Modular code.
+[More important notes]
+```
