@@ -15,3 +15,4 @@ You are a senior software engineer. Refactor the entire codebase for maintainabi
 - Remove dead code, merge similar utilities.
 - Update all files with clear commit messages and explanations.
 - Output all changes as diffs and highlight anything risky or needing follow-up tests
+- Ensure all changes are committed before changing anything
